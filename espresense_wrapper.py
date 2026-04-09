@@ -34,7 +34,7 @@ class ESPresenseWrapper:
             while time.time() < deadline:
                 try:
                     raw = ws.recv()
-                except WebSocketTimeoutException:
+                except Exception as e:
                     continue
 
                 parsed = self._safe_json(raw)

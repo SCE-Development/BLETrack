@@ -155,3 +155,6 @@
 1775700920: Client espresense-sce [192.168.97.1:41376] disconnected: session taken over.
 1775700920: New client connected from 192.168.97.1:53743 as espresense-sce (p4, c1, k15).
 1775701488: Client auto-87D34E6E-D461-2AF6-3F98-0BDCCA7A1B5C [192.168.97.1:59011] disconnected: connection closed by client.
+1775701880: New connection from 192.168.97.1:44132 on port 1883.
+1775701880: Client espresense-sce [192.168.97.1:53743] disconnected: session taken over.
+1775701880: New client connected from 192.168.97.1:44132 as espresense-sce (p4, c1, k15).
