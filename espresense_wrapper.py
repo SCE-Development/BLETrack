@@ -3,7 +3,11 @@ import time
 from typing import Any, Dict, Optional
 from urllib.parse import urlparse
 
-from websocket import WebSocketTimeoutException, create_connection
+from websocket import WebSocketException, WebSocketTimeoutException, create_connection
+
+
+class ESPresenseWrapperError(Exception):
+    pass
 
 
 class ESPresenseWrapper:
@@ -26,7 +30,13 @@ class ESPresenseWrapper:
         if payload is not None:
             message["payload"] = payload
 
-        ws = create_connection(ws_url, timeout=self.timeout_seconds)
+        try:
+            ws = create_connection(ws_url, timeout=self.timeout_seconds)
+        except (WebSocketException, OSError) as exc:
+            raise ESPresenseWrapperError(
+                f"Failed to connect to ESPresense websocket at {ws_url}"
+            ) from exc
+
         try:
             ws.send(json.dumps(message))
 
@@ -34,7 +44,7 @@ class ESPresenseWrapper:
             while time.time() < deadline:
                 try:
                     raw = ws.recv()
-                except Exception as e:
+                except WebSocketTimeoutException:
                     continue
 
                 parsed = self._safe_json(raw)
@@ -58,12 +68,17 @@ class ESPresenseWrapper:
                         }
 
             return {
-                "ok": True,
+                "ok": False,
                 "command": command,
                 "request": message,
                 "ack": None,
-                "warning": "Command sent but no matching state ack before timeout.",
+                "error": "timeout",
+                "message": "Command sent but no matching state ack before timeout.",
             }
+        except WebSocketException as exc:
+            raise ESPresenseWrapperError(
+                "Failed while sending/receiving websocket messages"
+            ) from exc
         finally:
             ws.close()
 
