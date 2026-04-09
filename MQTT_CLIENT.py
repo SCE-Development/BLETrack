@@ -22,6 +22,10 @@ def on_message(client, userdata, msg):
 client = mqtt.Client()
 client.on_message = on_message
 
+
+
+    
+
 print(f"Connecting to {MQTT_BROKER}...")
 client.connect(MQTT_BROKER, MQTT_PORT, 60)
 client.subscribe(MQTT_TOPIC)

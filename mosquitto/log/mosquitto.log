@@ -120,3 +120,38 @@
 1774055086: Client sce_ui_27518 [192.168.97.1:27029] disconnected: connection closed by client.
 1774055090: mosquitto version 2.1.2 terminating
 1774055090: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1775698536: mosquitto version 2.1.2 starting
+1775698536: Config loaded from /mosquitto/config/mosquitto.conf.
+1775698536: Bridge support available.
+1775698536: Persistence support available.
+1775698536: TLS support available.
+1775698536: TLS-PSK support available.
+1775698536: Websockets support available.
+1775698536: Opening ipv4 listen socket on port 1883.
+1775698536: Opening ipv6 listen socket on port 1883.
+1775698536: Opening ipv4 listen socket on port 9001.
+1775698536: Opening ipv6 listen socket on port 9001.
+1775698536: mosquitto version 2.1.2 running
+1775699349: New connection from 192.168.97.1:41907 on port 1883.
+1775699349: New client connected from 192.168.97.1:41907 as mqtt-explorer-f19104f5 (p4, c1, k60).
+1775699477: New connection from 192.168.97.1:59011 on port 1883.
+1775699477: New client connected from 192.168.97.1:59011 as auto-87D34E6E-D461-2AF6-3F98-0BDCCA7A1B5C (p4, c1, k60).
+1775699691: New connection from 192.168.97.1:54314 on port 1883.
+1775699691: New client connected from 192.168.97.1:54314 as espresense-sce (p4, c1, k15).
+1775699778: Client espresense-sce [192.168.97.1:54314] disconnected: exceeded timeout.
+1775699912: New connection from 192.168.97.1:58369 on port 1883.
+1775699912: New client connected from 192.168.97.1:58369 as espresense-sce (p4, c1, k15).
+1775700047: New connection from 192.168.97.1:40993 on port 1883.
+1775700047: Client espresense-sce [192.168.97.1:58369] disconnected: session taken over.
+1775700047: New client connected from 192.168.97.1:40993 as espresense-sce (p4, c1, k15).
+1775700171: New connection from 192.168.97.1:49788 on port 1883.
+1775700171: Client espresense-sce [192.168.97.1:40993] disconnected: session taken over.
+1775700171: New client connected from 192.168.97.1:49788 as espresense-sce (p4, c1, k15).
+1775700205: Client espresense-sce [192.168.97.1:49788] disconnected: connection closed by client.
+1775700205: New connection from 192.168.97.1:41376 on port 1883.
+1775700205: New client connected from 192.168.97.1:41376 as espresense-sce (p4, c1, k15).
+1775700336: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1775700920: New connection from 192.168.97.1:53743 on port 1883.
+1775700920: Client espresense-sce [192.168.97.1:41376] disconnected: session taken over.
+1775700920: New client connected from 192.168.97.1:53743 as espresense-sce (p4, c1, k15).
+1775701488: Client auto-87D34E6E-D461-2AF6-3F98-0BDCCA7A1B5C [192.168.97.1:59011] disconnected: connection closed by client.
