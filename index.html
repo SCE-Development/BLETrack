@@ -6,26 +6,30 @@
   <title>BLETrack Device Manager</title>
   <style>
     :root {
-      --bg: #0b1020;
-      --panel: #131a2e;
-      --panel-2: #1b2440;
-      --text: #edf2ff;
-      --muted: #9aa6c7;
-      --accent: #4da3ff;
-      --ok: #22c55e;
-      --warn: #f59e0b;
-      --err: #ef4444;
-      --border: #2a365f;
+      --bg: #111827;
+      --panel: #1f2937;
+      --panel-2: #273548;
+      --text: #e5e7eb;
+      --muted: #a6adbb;
+      --accent: #334d7a;
+      --accent-strong: #243a63;
+      --ok: #34d399;
+      --warn: #fbbf24;
+      --err: #f87171;
+      --border: #374151;
     }
     * { box-sizing: border-box; }
     body {
       margin: 0;
-      background: radial-gradient(circle at 20% 0%, #1d2f59 0%, var(--bg) 42%);
+      background:
+        radial-gradient(circle at 5% 0%, #223048 0%, rgba(34, 48, 72, 0) 36%),
+        radial-gradient(circle at 100% 0%, #1f2d43 0%, rgba(31, 45, 67, 0) 34%),
+        var(--bg);
       color: var(--text);
       font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
-    .wrap { max-width: 1200px; margin: 0 auto; padding: 24px; }
-    h1 { margin: 0 0 8px; font-size: 30px; }
+    .wrap { max-width: 1240px; margin: 0 auto; padding: 28px 20px 36px; }
+    h1 { margin: 0 0 8px; font-size: 32px; font-weight: 700; letter-spacing: -0.02em; }
     p { margin: 0; color: var(--muted); }
     .status {
       margin-top: 16px;
@@ -33,24 +37,27 @@
       border: 1px solid var(--border);
       border-radius: 12px;
       background: var(--panel);
+      box-shadow: 0 8px 18px rgba(24, 39, 66, 0.09);
       display: flex;
       gap: 16px;
       flex-wrap: wrap;
       font-size: 14px;
     }
+    .status strong { color: #f3f4f6; }
     .grid {
       margin-top: 20px;
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 16px;
+      gap: 20px;
     }
     .card {
       border: 1px solid var(--border);
       border-radius: 16px;
       background: var(--panel);
       padding: 16px;
+      box-shadow: 0 10px 26px rgba(24, 39, 66, 0.11);
     }
-    .card h2 { margin: 0 0 12px; font-size: 18px; }
+    .card h2 { margin: 0 0 12px; font-size: 18px; font-weight: 600; color: #f3f4f6; }
     .toolbar { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
     button {
       border: 1px solid var(--border);
@@ -60,21 +67,29 @@
       padding: 8px 12px;
       cursor: pointer;
       font-weight: 600;
+      transition: background-color 120ms ease, border-color 120ms ease, transform 120ms ease;
     }
-    button.primary { background: var(--accent); border-color: var(--accent); color: #051321; }
+    button:hover { border-color: #4b5563; background: #334155; }
+    button:active { transform: translateY(1px); }
+    button.primary { background: var(--accent); border-color: var(--accent); color: #ffffff; }
+    button.primary:hover { background: var(--accent-strong); border-color: var(--accent-strong); }
     table {
       width: 100%;
       border-collapse: collapse;
       font-size: 13px;
+      background: #1b2533;
+      border-radius: 10px;
+      overflow: hidden;
     }
     th, td {
       text-align: left;
       padding: 8px;
-      border-bottom: 1px solid #253152;
+      border-bottom: 1px solid var(--border);
       vertical-align: top;
       word-break: break-word;
     }
-    th { color: var(--muted); font-weight: 600; }
+    tbody tr:hover { background: #253347; }
+    th { color: #cbd5e1; font-weight: 600; background: #223043; }
     .form {
       margin-top: 12px;
       display: grid;
@@ -85,7 +100,7 @@
     .form input, .form select {
       width: 100%;
       border: 1px solid var(--border);
-      background: #0f1730;
+      background: #1a2433;
       color: var(--text);
       border-radius: 8px;
       padding: 8px;
@@ -103,18 +118,23 @@
     .inline-form input, .inline-form select {
       width: 100%;
       border: 1px solid var(--border);
-      background: #0f1730;
+      background: #1a2433;
       color: var(--text);
       border-radius: 8px;
       padding: 8px;
     }
+    .inline-form input:focus, .inline-form select:focus, .form input:focus, .form select:focus {
+      outline: none;
+      border-color: #5e7aa8;
+      box-shadow: 0 0 0 3px rgba(51, 77, 122, 0.24);
+    }
     .mono {
       margin-top: 12px;
       padding: 10px;
-      border: 1px solid #253152;
+      border: 1px solid var(--border);
       border-radius: 10px;
-      background: #0d142a;
-      color: #d5e2ff;
+      background: #111827;
+      color: #e5e7eb;
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
       font-size: 12px;
       max-height: 260px;
@@ -125,22 +145,25 @@
     .ok { color: var(--ok); }
     .err { color: var(--err); }
     @media (max-width: 960px) {
-      .grid { grid-template-columns: 1fr; }
+      .wrap { padding: 20px 14px 24px; }
+      h1 { font-size: 28px; }
+      .grid { grid-template-columns: 1fr; gap: 14px; }
       .inline-form { grid-template-columns: 1fr; }
+      .toolbar button { flex: 1; }
     }
   </style>
 </head>
 <body>
   <div class="wrap">
     <h1>BLETrack Device Manager</h1>
-    <p>Manage enrolled devices and inspect live discovered IDs.</p>
+    <p>Pair known devices, auto-apply filters, and monitor live status.</p>
 
     <div class="status" id="health"></div>
 
     <div class="grid">
       <section class="card stack">
         <div>
-          <h2>Enrollment Controls</h2>
+          <h2>Enrollment</h2>
           <div class="inline-form">
             <label>
               Device Type
@@ -153,7 +176,7 @@
             </label>
             <label>
               Enroll Name
-              <input id="enroll-name" placeholder="andrew_phone" value="new_device" />
+              <input id="enroll-name" placeholder="andrew_iphone" value="new_device" />
             </label>
             <button class="primary" onclick="startEnroll()">Start Enroll</button>
             <button onclick="cancelEnroll()">Cancel Enroll</button>
@@ -162,110 +185,78 @@
         </div>
 
         <div>
-          <h2>API Tester</h2>
+          <h2>Finalize Pairing</h2>
+          <div class="inline-form">
+            <label>
+              Public Name
+              <input id="pair-public-name" placeholder="Andrew iPhone" />
+            </label>
+            <label>
+              Device Type
+              <select id="pair-device-type">
+                <option value="phone">phone</option>
+                <option value="watch">watch</option>
+                <option value="tablet">tablet</option>
+                <option value="other">other</option>
+              </select>
+            </label>
+            <label>
+              Fingerprint ID
+              <select id="pair-fingerprint"></select>
+            </label>
+            <label>
+              Or Live Device ID
+              <select id="pair-observed"></select>
+            </label>
+            <button class="primary" onclick="finalizePairing()">Pair Device</button>
+          </div>
           <div class="toolbar">
-            <button onclick="testLatest()">/presence/latest</button>
-            <button onclick="testHistory()">/presence/history</button>
-            <button onclick="testFingerprints()">/debug/fingerprints</button>
-            <button onclick="testDiscovered()">/devices/discovered</button>
-            <button onclick="testManaged()">/devices/managed</button>
+            <button onclick="loadFingerprintOptions()">Refresh Fingerprints</button>
+            <button onclick="loadObservedOptions()">Refresh Live IDs</button>
           </div>
-          <div class="msg" id="tester-label">Response preview:</div>
-          <pre class="mono" id="tester-output">Run an endpoint to see JSON here.</pre>
+          <div class="msg" id="pair-msg"></div>
         </div>
       </section>
 
       <section class="card">
-        <h2>Managed Devices</h2>
+        <h2>Paired Devices</h2>
         <div class="toolbar">
-          <button onclick="loadManaged()">Refresh</button>
+          <button onclick="loadPairedDevices()">Refresh</button>
         </div>
         <table>
           <thead>
             <tr>
-              <th>Name</th>
-              <th>Observed ID</th>
+              <th>Public Name</th>
+              <th>Fingerprint ID</th>
               <th>Type</th>
-              <th>Last Seen</th>
-            </tr>
-          </thead>
-          <tbody id="managed-body"></tbody>
-        </table>
-
-        <form class="form" onsubmit="saveManaged(event)">
-          <label>
-            Display Name
-            <input id="display_name" required placeholder="andrew" />
-          </label>
-          <label>
-            Device Type
-            <select id="device_type">
-              <option value="phone">phone</option>
-              <option value="watch">watch</option>
-              <option value="tablet">tablet</option>
-              <option value="other">other</option>
-            </select>
-          </label>
-          <label class="full">
-            Observed Device ID (from discovered list)
-            <input id="observed_device_id" required placeholder="phone or e279fbde5c8b" />
-          </label>
-          <label class="full">
-            Fingerprint Device ID (optional, e.g. phone:andrew_ipad)
-            <input id="fingerprint_device_id" placeholder="phone:andrew_ipad" />
-          </label>
-          <label>
-            Active
-            <select id="is_active">
-              <option value="true">true</option>
-              <option value="false">false</option>
-            </select>
-          </label>
-          <div class="full">
-            <button class="primary" type="submit">Save Device</button>
-          </div>
-        </form>
-        <div class="msg" id="save-msg"></div>
-      </section>
-
-      <section class="card">
-        <h2>Discovered Devices</h2>
-        <div class="toolbar">
-          <button onclick="loadDiscovered()">Refresh</button>
-        </div>
-        <table>
-          <thead>
-            <tr>
-              <th>Device ID</th>
-              <th>Name</th>
-              <th>Distance</th>
+              <th>Status</th>
               <th>Action</th>
             </tr>
           </thead>
-          <tbody id="discovered-body"></tbody>
+          <tbody id="paired-body"></tbody>
         </table>
+        <div class="msg" id="paired-msg"></div>
       </section>
 
       <section class="card">
-        <h2>Enrolled Devices (Live)</h2>
+        <h2>Current Detected Devices</h2>
         <div class="toolbar">
-          <button onclick="loadEnrolled()">Refresh</button>
+          <button onclick="loadCurrentDetected()">Refresh</button>
         </div>
         <table>
           <thead>
             <tr>
-              <th>Enrolled ID</th>
-              <th>Live ID</th>
-              <th>Device Name</th>
-              <th>Alias</th>
+              <th>Public Name</th>
+              <th>Live Name</th>
               <th>Room</th>
               <th>Distance</th>
               <th>Last Seen</th>
+              <th>Status</th>
             </tr>
           </thead>
-          <tbody id="enrolled-body"></tbody>
+          <tbody id="current-body"></tbody>
         </table>
-        <div class="msg" id="enrolled-msg"></div>
+        <div class="msg" id="current-msg"></div>
       </section>
     </div>
   </div>
@@ -288,20 +279,10 @@
       return d.toLocaleString();
     }
 
-    function rowDeviceName(row) {
-      if (!row || !row.payload || typeof row.payload !== 'object') return '-';
-      return safe(row.payload.name);
-    }
-
-    function normalizeId(value) {
-      return String(value || '').trim().toLowerCase();
-    }
-
-    function getBaseId(value) {
-      const normalized = normalizeId(value);
-      if (!normalized) return '';
-      const parts = normalized.split(':');
-      return parts[0] || normalized;
+    function setMessage(id, text, cls) {
+      const el = document.getElementById(id);
+      el.textContent = text;
+      el.className = `msg ${cls || ''}`.trim();
     }
 
     async function loadHealth() {
@@ -322,17 +303,6 @@
       }
     }
 
-    function setMessage(id, text, cls) {
-      const el = document.getElementById(id);
-      el.textContent = text;
-      el.className = `msg ${cls || ''}`.trim();
-    }
-
-    function setTesterOutput(label, data) {
-      document.getElementById('tester-label').textContent = label;
-      document.getElementById('tester-output').textContent = JSON.stringify(data, null, 2);
-    }
-
     async function startEnroll() {
       const deviceType = document.getElementById('enroll-device-type').value.trim();
       const name = document.getElementById('enroll-name').value.trim() || 'new_device';
@@ -340,12 +310,11 @@
       try {
         const params = new URLSearchParams({ device_type: deviceType, name });
         const data = await getJSON(`/enroll/start?${params.toString()}`);
-        setTesterOutput('Response preview: GET /enroll/start', data);
         if (data.ok === false) {
-          setMessage('enroll-msg', `Enroll start failed: ${data.message || 'unknown error'}`, 'err');
+          setMessage('enroll-msg', `Enroll start failed: ${safe(data.message || 'unknown error')}`, 'err');
           return;
         }
-        setMessage('enroll-msg', 'Enrollment start command sent.', 'ok');
+        setMessage('enroll-msg', 'Enrollment started. Pair on your phone/iPad, then click Refresh Fingerprints and Pair Device.', 'ok');
       } catch (err) {
         setMessage('enroll-msg', `Enroll start failed: ${err.message}`, 'err');
       }
@@ -355,9 +324,8 @@
       setMessage('enroll-msg', 'Canceling enrollment...', '');
       try {
         const data = await getJSON('/enroll/cancel');
-        setTesterOutput('Response preview: GET /enroll/cancel', data);
         if (data.ok === false) {
-          setMessage('enroll-msg', `Enroll cancel failed: ${data.message || 'unknown error'}`, 'err');
+          setMessage('enroll-msg', `Enroll cancel failed: ${safe(data.message || 'unknown error')}`, 'err');
           return;
         }
         setMessage('enroll-msg', 'Enrollment canceled.', 'ok');
@@ -366,192 +334,225 @@
       }
     }
 
-    async function runTester(path) {
+    async function loadFingerprintOptions() {
+      const select = document.getElementById('pair-fingerprint');
+      select.innerHTML = '';
       try {
-        const data = await getJSON(path);
-        setTesterOutput(`Response preview: GET ${path}`, data);
+        const [fingerprintsResp, managedResp] = await Promise.all([
+          getJSON('/debug/fingerprints?limit=500'),
+          getJSON('/devices/managed?limit=500')
+        ]);
+
+        const fingerprints = Array.isArray(fingerprintsResp.data) ? fingerprintsResp.data : [];
+        const managed = Array.isArray(managedResp.data) ? managedResp.data : [];
+        const activeIds = new Set(
+          managed
+            .filter((r) => r.is_active && r.fingerprint_device_id)
+            .map((r) => String(r.fingerprint_device_id))
+        );
+
+        const available = fingerprints
+          .map((r) => String(r.device_id || '').trim())
+          .filter((id) => id && !activeIds.has(id));
+
+        if (available.length === 0) {
+          const option = document.createElement('option');
+          option.value = '';
+          option.textContent = 'No unpaired fingerprints found (use Live Device ID)';
+          select.appendChild(option);
+          setMessage('pair-msg', 'No unpaired fingerprint IDs available. You can pair using Live Device ID.', '');
+          return;
+        }
+
+        available.sort((a, b) => a.localeCompare(b));
+        for (const id of available) {
+          const option = document.createElement('option');
+          option.value = id;
+          option.textContent = id;
+          select.appendChild(option);
+        }
+        setMessage('pair-msg', `Loaded ${available.length} unpaired fingerprint ID(s).`, '');
       } catch (err) {
-        setTesterOutput(`Response preview: GET ${path}`, { ok: false, error: String(err.message || err) });
+        const option = document.createElement('option');
+        option.value = '';
+        option.textContent = 'Failed to load fingerprints';
+        select.appendChild(option);
+        setMessage('pair-msg', `Failed to load fingerprints: ${err.message}`, 'err');
       }
     }
 
-    function testLatest() {
-      runTester('/presence/latest?limit=50');
-    }
+    async function loadObservedOptions() {
+      const select = document.getElementById('pair-observed');
+      select.innerHTML = '';
+      try {
+        const data = await getJSON('/pair/candidates?limit=500');
+        const rows = Array.isArray(data.data) ? data.data : [];
 
-    function testHistory() {
-      runTester('/presence/history?minutes=60&limit=100');
-    }
+        const empty = document.createElement('option');
+        empty.value = '';
+        empty.textContent = rows.length ? 'Select live device ID' : 'No unpaired live IDs found';
+        select.appendChild(empty);
 
-    function testFingerprints() {
-      runTester('/debug/fingerprints?limit=200');
-    }
-
-    function testDiscovered() {
-      runTester('/devices/discovered?limit=200');
-    }
-
-    function testManaged() {
-      runTester('/devices/managed?limit=200');
-    }
-
-    async function loadManaged() {
-      const data = await getJSON('/devices/managed');
-      const body = document.getElementById('managed-body');
-      body.innerHTML = '';
-      for (const row of data.data) {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${safe(row.display_name)}${row.is_active ? '' : ' (inactive)'}</td>
-          <td>${safe(row.observed_device_id)}</td>
-          <td>${safe(row.device_type)}</td>
-          <td>${fmtTs(row.last_seen_ts)} ${row.last_distance_m != null ? `(${row.last_distance_m.toFixed(2)}m)` : ''}</td>
-        `;
-        body.appendChild(tr);
+        for (const row of rows) {
+          const option = document.createElement('option');
+          option.value = String(row.observed_device_id || '').trim();
+          const liveName = row.live_name ? ` (${row.live_name})` : '';
+          option.textContent = `${row.observed_device_id}${liveName}`;
+          select.appendChild(option);
+        }
+      } catch (err) {
+        const option = document.createElement('option');
+        option.value = '';
+        option.textContent = 'Failed to load live IDs';
+        select.appendChild(option);
       }
     }
 
-    function useDeviceId(id) {
-      document.getElementById('observed_device_id').value = id;
-      document.getElementById('save-msg').textContent = `Selected ${id} for mapping.`;
-      document.getElementById('save-msg').className = 'msg';
-      document.getElementById('enroll-name').value = id.replace(/[:\s]+/g, '_');
-    }
+    async function finalizePairing() {
+      const publicName = document.getElementById('pair-public-name').value.trim();
+      const deviceType = document.getElementById('pair-device-type').value.trim();
+      const fingerprintId = document.getElementById('pair-fingerprint').value.trim();
+      const observedId = document.getElementById('pair-observed').value.trim();
 
-    async function loadDiscovered() {
-      const data = await getJSON('/devices/discovered?limit=200');
-      const body = document.getElementById('discovered-body');
-      body.innerHTML = '';
-      for (const row of data.data) {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${safe(row.device_id)}</td>
-          <td>${safe(row.discovered_name)}</td>
-          <td>${row.distance_m != null ? `${row.distance_m.toFixed(2)}m` : '-'}</td>
-          <td><button onclick="useDeviceId('${String(row.device_id).replace(/'/g, "\\'")}')">Use</button></td>
-        `;
-        body.appendChild(tr);
+      if (!publicName) {
+        setMessage('pair-msg', 'Public Name is required.', 'err');
+        return;
+      }
+      if (!fingerprintId && !observedId) {
+        setMessage('pair-msg', 'Select a Fingerprint ID or Live Device ID.', 'err');
+        return;
+      }
+
+      setMessage('pair-msg', 'Pairing device and updating filter...', '');
+      try {
+        const res = await fetch('/pair/finalize', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            public_name: publicName,
+            device_type: deviceType,
+            fingerprint_device_id: fingerprintId || null,
+            observed_device_id: observedId || null
+          })
+        });
+        const data = await res.json();
+        if (!res.ok || data.ok === false) {
+          setMessage('pair-msg', `Pair failed: ${safe(data.message || data.error || res.statusText)}`, 'err');
+          return;
+        }
+
+        setMessage('pair-msg', 'Device paired and include filter updated.', 'ok');
+        document.getElementById('pair-public-name').value = '';
+        await Promise.all([loadFingerprintOptions(), loadObservedOptions(), loadPairedDevices(), loadCurrentDetected()]);
+      } catch (err) {
+        setMessage('pair-msg', `Pair failed: ${err.message}`, 'err');
       }
     }
 
-    async function loadEnrolled() {
-      const body = document.getElementById('enrolled-body');
-      const msg = document.getElementById('enrolled-msg');
+    async function removePairedDevice(publicName) {
+      setMessage('paired-msg', `Removing ${publicName}...`, '');
+      try {
+        const res = await fetch('/pair/remove', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ public_name: publicName })
+        });
+        const data = await res.json();
+        if (!res.ok || data.ok === false) {
+          setMessage('paired-msg', `Remove failed: ${safe(data.message || data.error || res.statusText)}`, 'err');
+          return;
+        }
+
+        setMessage('paired-msg', `Removed ${publicName} and refreshed include filter.`, 'ok');
+        await Promise.all([loadFingerprintOptions(), loadObservedOptions(), loadPairedDevices(), loadCurrentDetected()]);
+      } catch (err) {
+        setMessage('paired-msg', `Remove failed: ${err.message}`, 'err');
+      }
+    }
+
+    async function loadPairedDevices() {
+      const body = document.getElementById('paired-body');
+      const msg = document.getElementById('paired-msg');
       body.innerHTML = '';
       msg.textContent = '';
       msg.className = 'msg';
 
       try {
-        const [presenceResp, managedResp, fingerprintsResp] = await Promise.all([
-          getJSON('/presence/latest?limit=500'),
-          getJSON('/devices/managed?limit=500'),
-          getJSON('/debug/fingerprints?limit=500')
-        ]);
+        const data = await getJSON('/dashboard/current?limit=500');
+        const rows = Array.isArray(data.data) ? data.data : [];
 
-        const presenceRows = Array.isArray(presenceResp.data) ? presenceResp.data : [];
-        const managedRows = Array.isArray(managedResp.data) ? managedResp.data.filter((r) => r.is_active) : [];
-        const fingerprintRows = Array.isArray(fingerprintsResp.data) ? fingerprintsResp.data : [];
-
-        const managedByObserved = new Map();
-        const managedByFingerprint = new Map();
-        for (const m of managedRows) {
-          const observed = normalizeId(m.observed_device_id);
-          const fingerprint = normalizeId(m.fingerprint_device_id);
-          const fingerprintBase = getBaseId(fingerprint);
-          if (observed) managedByObserved.set(observed, m.display_name);
-          if (fingerprint) managedByFingerprint.set(fingerprint, m.display_name);
-          if (fingerprintBase) managedByFingerprint.set(fingerprintBase, m.display_name);
-        }
-
-        const presenceById = new Map();
-        for (const row of presenceRows) {
-          const key = normalizeId(row.device_id);
-          if (key && !presenceById.has(key)) presenceById.set(key, row);
-        }
-
-        const enrolledIds = new Set();
-        for (const f of fingerprintRows) {
-          const key = normalizeId(f.device_id);
-          if (key) enrolledIds.add(key);
-        }
-        for (const m of managedRows) {
-          const fp = normalizeId(m.fingerprint_device_id);
-          const observed = normalizeId(m.observed_device_id);
-          if (fp) enrolledIds.add(fp);
-          else if (observed) enrolledIds.add(observed);
-        }
-
-        if (enrolledIds.size === 0) {
-          msg.textContent = 'No enrolled identities yet. Start enrollment to add one.';
+        if (rows.length === 0) {
+          msg.textContent = 'No paired devices yet.';
           return;
         }
 
-        let liveCount = 0;
-        const sortedIds = Array.from(enrolledIds).sort((a, b) => a.localeCompare(b));
-        for (const enrolledId of sortedIds) {
-          const baseId = getBaseId(enrolledId);
-          const matchedRow = presenceById.get(enrolledId) || presenceById.get(baseId) || null;
-          if (matchedRow) liveCount += 1;
-
-          const mappedName = managedByFingerprint.get(enrolledId)
-            || managedByFingerprint.get(baseId)
-            || managedByObserved.get(enrolledId)
-            || managedByObserved.get(baseId)
-            || null;
-
+        for (const row of rows) {
           const tr = document.createElement('tr');
+          const nameEscaped = String(row.public_name || '').replace(/'/g, "\\'");
+          const isOnline = Boolean(row.is_online);
           tr.innerHTML = `
-            <td>${safe(enrolledId)}</td>
-            <td>${safe(matchedRow ? matchedRow.device_id : '-')}</td>
-            <td>${matchedRow ? rowDeviceName(matchedRow) : '-'}</td>
-            <td>${safe(mappedName || (matchedRow ? matchedRow.alias : null))}</td>
-            <td>${safe(matchedRow ? matchedRow.room : null)}</td>
-            <td>${matchedRow && matchedRow.distance_m != null ? `${matchedRow.distance_m.toFixed(2)}m` : '-'}</td>
-            <td>${fmtTs(matchedRow ? matchedRow.ts : null)}</td>
+            <td>${safe(row.public_name)}</td>
+            <td>${safe(row.fingerprint_device_id || row.observed_device_id)}</td>
+            <td>${safe(row.device_type)}</td>
+            <td>${isOnline ? 'online' : 'offline'}</td>
+            <td><button onclick="removePairedDevice('${nameEscaped}')">Remove</button></td>
           `;
           body.appendChild(tr);
         }
-        msg.textContent = `Showing ${enrolledIds.size} enrolled device(s), ${liveCount} currently seen live.`;
+        msg.textContent = `Showing ${rows.length} paired device(s).`;
       } catch (err) {
-        msg.textContent = `Failed to load enrolled devices: ${err.message}`;
+        msg.textContent = `Failed to load paired devices: ${err.message}`;
         msg.className = 'msg err';
       }
     }
 
-    async function saveManaged(event) {
-      event.preventDefault();
-      const msg = document.getElementById('save-msg');
-      msg.textContent = 'Saving...';
+    async function loadCurrentDetected() {
+      const body = document.getElementById('current-body');
+      const msg = document.getElementById('current-msg');
+      body.innerHTML = '';
+      msg.textContent = '';
       msg.className = 'msg';
 
-      const payload = {
-        display_name: document.getElementById('display_name').value.trim(),
-        device_type: document.getElementById('device_type').value.trim(),
-        observed_device_id: document.getElementById('observed_device_id').value.trim(),
-        fingerprint_device_id: document.getElementById('fingerprint_device_id').value.trim() || null,
-        is_active: document.getElementById('is_active').value === 'true'
-      };
-
       try {
-        const res = await fetch('/devices/managed', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
-        await loadManaged();
-        await loadEnrolled();
-        msg.textContent = 'Saved successfully.';
-        msg.className = 'msg ok';
+        const data = await getJSON('/dashboard/current?limit=500');
+        const rows = Array.isArray(data.data) ? data.data : [];
+
+        if (rows.length === 0) {
+          msg.textContent = 'No paired devices configured yet.';
+          return;
+        }
+
+        let onlineCount = 0;
+        for (const row of rows) {
+          if (row.is_online) onlineCount += 1;
+          const tr = document.createElement('tr');
+          const statusText = row.status || (row.is_online ? 'online' : 'offline');
+          tr.innerHTML = `
+            <td>${safe(row.public_name)}</td>
+            <td>${safe(row.payload_name)}</td>
+            <td>${safe(row.room)}</td>
+            <td>${row.distance_m != null ? `${row.distance_m.toFixed(2)}m` : '-'}</td>
+            <td>${fmtTs(row.last_seen_ts)}</td>
+            <td>${safe(statusText)}</td>
+          `;
+          body.appendChild(tr);
+        }
+        msg.textContent = `${onlineCount}/${rows.length} currently online.`;
       } catch (err) {
-        msg.textContent = `Save failed: ${err.message}`;
+        msg.textContent = `Failed to load current detected devices: ${err.message}`;
         msg.className = 'msg err';
       }
     }
 
     async function bootstrap() {
       try {
-        await Promise.all([loadHealth(), loadManaged(), loadDiscovered(), loadEnrolled()]);
+        await Promise.all([
+          loadHealth(),
+          loadFingerprintOptions(),
+          loadObservedOptions(),
+          loadPairedDevices(),
+          loadCurrentDetected()
+        ]);
       } catch (err) {
         console.error(err);
       }
@@ -559,7 +560,7 @@
 
     bootstrap();
     setInterval(loadHealth, 3000);
-    setInterval(loadEnrolled, 5000);
+    setInterval(loadCurrentDetected, 5000);
   </script>
 </body>
 </html>

@@ -1,7 +1,9 @@
 import json
 import time
 from typing import Any, Dict, Optional
-from urllib.parse import urlparse
+from urllib.error import HTTPError, URLError
+from urllib.parse import urlencode, urlparse
+from urllib.request import Request, urlopen
 
 from websocket import WebSocketException, WebSocketTimeoutException, create_connection
 
@@ -21,6 +23,22 @@ class ESPresenseWrapper:
 
     def cancel_enrollment(self) -> Dict[str, Any]:
         return self._send_command("cancelEnroll")
+
+    def update_filters(
+        self, include: Optional[str] = None, exclude: Optional[str] = None
+    ) -> Dict[str, Any]:
+        form: Dict[str, str] = {}
+        if include is not None:
+            form["include"] = include
+        if exclude is not None:
+            form["exclude"] = exclude
+        if not form:
+            return {
+                "ok": False,
+                "error": "invalid_request",
+                "message": "At least one of include or exclude is required.",
+            }
+        return self._post_form("/wifi/extras", form)
 
     def _send_command(
         self, command: str, payload: Optional[str] = None
@@ -89,6 +107,35 @@ class ESPresenseWrapper:
         if not host:
             host = parsed.path
         return f"{scheme}://{host}/ws"
+
+    def _build_http_url(self, path: str) -> str:
+        return f"{self.base_url}{path}"
+
+    def _post_form(self, path: str, form: Dict[str, str]) -> Dict[str, Any]:
+        url = self._build_http_url(path)
+        body = urlencode(form).encode("utf-8")
+        req = Request(
+            url=url,
+            data=body,
+            headers={"Content-Type": "application/x-www-form-urlencoded"},
+            method="POST",
+        )
+        try:
+            with urlopen(req, timeout=self.timeout_seconds) as res:
+                raw = res.read().decode("utf-8", errors="replace")
+                return {
+                    "ok": True,
+                    "path": path,
+                    "request": form,
+                    "status": getattr(res, "status", 200),
+                    "body": raw,
+                }
+        except HTTPError as exc:
+            raise ESPresenseWrapperError(
+                f"Failed POST {path} with status {exc.code}"
+            ) from exc
+        except URLError as exc:
+            raise ESPresenseWrapperError(f"Failed to connect to {url}") from exc
 
     @staticmethod
     def _safe_json(raw: Any) -> Dict[str, Any]:

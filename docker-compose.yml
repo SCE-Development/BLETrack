@@ -1,4 +1,26 @@
 services:
+  api:
+    image: python:3.11-slim
+    container_name: bletrack-api
+    restart: always
+    working_dir: /app
+    command: sh -c "pip install --no-cache-dir -r requirements.txt && uvicorn main:app --host 0.0.0.0 --port 5055"
+    env_file:
+      - .env
+    environment:
+      MQTT_BROKER: mosquitto
+      MQTT_PORT: 1883
+      DATABASE_URL: postgresql://${POSTGRES_USER:-bletrack}:${POSTGRES_PASSWORD:-bletrack_dev_password}@timescaledb:5432/${POSTGRES_DB:-bletrack}
+    volumes:
+      - ./:/app
+    ports:
+      - "5055:5055"
+    depends_on:
+      - mosquitto
+      - timescaledb
+    networks:
+      - ble_net
+
   mosquitto:
     image: eclipse-mosquitto:latest
     container_name: mosquitto

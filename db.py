@@ -149,10 +149,18 @@ def list_managed_devices(limit: int = 500) -> List[Dict[str, Any]]:
                     p.ts AS last_seen_ts,
                     p.room AS last_seen_room,
                     p.distance_m AS last_distance_m,
-                    p.rssi AS last_rssi
+                    p.rssi AS last_rssi,
+                    p.device_id AS last_live_device_id,
+                    p.payload_name AS last_payload_name
                 FROM managed_devices m
                 LEFT JOIN LATERAL (
-                    SELECT ts, room, distance_m, rssi
+                    SELECT
+                        ts,
+                        room,
+                        distance_m,
+                        rssi,
+                        device_id,
+                        payload->>'name' AS payload_name
                     FROM presence_events pe
                     WHERE (
                         pe.device_id = m.observed_device_id
@@ -175,6 +183,48 @@ def list_managed_devices(limit: int = 500) -> List[Dict[str, Any]]:
             )
             rows = cur.fetchall()
             return [dict(row) for row in rows]
+
+
+def set_managed_device_active(
+    display_name: str, is_active: bool
+) -> Optional[Dict[str, Any]]:
+    with get_db() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                UPDATE managed_devices
+                SET is_active = %s,
+                    updated_at = NOW()
+                WHERE display_name = %s
+                RETURNING
+                    id,
+                    display_name,
+                    observed_device_id,
+                    device_type,
+                    fingerprint_device_id,
+                    is_active,
+                    created_at,
+                    updated_at
+                """,
+                (is_active, display_name),
+            )
+            row = cur.fetchone()
+            return dict(row) if row else None
+
+
+def query_fingerprint_by_device_id(device_id: str) -> Optional[Dict[str, Any]]:
+    with get_db() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                SELECT device_id, fingerprint_value, updated_at
+                FROM fingerprint_registry
+                WHERE device_id = %s
+                """,
+                (device_id,),
+            )
+            row = cur.fetchone()
+            return dict(row) if row else None
 
 
 def query_discovered_devices(limit: int = 500) -> List[Dict[str, Any]]:

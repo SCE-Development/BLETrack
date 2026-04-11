@@ -84,6 +84,17 @@ Retention:
   - Starts ESPresense enrollment mode.
 - `GET /enroll/cancel`
   - Cancels enrollment mode.
+- `POST /espresense/filter`
+  - Updates ESPresense include/exclude filters via `/wifi/extras` form submit.
+  - JSON body: `{"include": "phone:andrew_iphone", "exclude": "enroll_mode"}`
+- `POST /pair/finalize`
+  - Finalizes a device pairing from fingerprint ID, upserts `managed_devices`, and auto-rebuilds ESPresense include filter from active paired devices.
+  - JSON body: `{"public_name": "Andrew iPhone", "device_type": "phone", "fingerprint_device_id": "phone:andrew_iphone"}`
+- `POST /pair/remove`
+  - Marks a paired device inactive and auto-rebuilds ESPresense include filter.
+  - JSON body: `{"public_name": "Andrew iPhone"}`
+- `GET /dashboard/current?limit=500`
+  - Returns only active paired devices with current online/offline status and latest signal snapshot.
 - `GET /presence/latest?limit=100&room=sce&paired_only=true`
   - Latest event per `device_id`.
 - `GET /presence/history?minutes=60&limit=1000&room=sce&paired_only=true`
