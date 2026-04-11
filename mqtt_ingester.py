@@ -19,6 +19,9 @@ class MQTTIngester:
         self._thread: Optional[threading.Thread] = None
         self._running = False
         self._connected = False
+        self._processed_count = 0
+        self._failed_count = 0
+        self._last_error: Optional[str] = None
 
     def start(self) -> None:
         if self._running:
@@ -43,11 +46,18 @@ class MQTTIngester:
             "broker": self.broker,
             "port": self.port,
             "topic": self.topic,
+            "processed_count": self._processed_count,
+            "failed_count": self._failed_count,
+            "last_error": self._last_error,
         }
 
     def _run(self) -> None:
-        self._client.connect(self.broker, self.port, 60)
-        self._client.loop_forever()
+        try:
+            self._client.connect(self.broker, self.port, 60)
+            self._client.loop_forever()
+        except Exception as exc:
+            self._connected = False
+            self._last_error = str(exc)
 
     def _on_connect(
         self, client: mqtt.Client, userdata: Any, flags: Dict[str, Any], rc: int
@@ -83,7 +93,10 @@ class MQTTIngester:
                 topic=topic,
                 payload=parsed if isinstance(parsed, dict) else {},
             )
+            self._processed_count += 1
         except Exception:
+            self._failed_count += 1
+            self._last_error = "failed_to_insert_presence_event"
             return
 
     @staticmethod

@@ -5,6 +5,7 @@ from typing import Any, Dict, Iterator, List, Optional
 from dotenv import load_dotenv
 from psycopg import Connection, connect
 from psycopg.rows import dict_row
+from psycopg.types.json import Jsonb
 
 
 load_dotenv()
@@ -12,7 +13,7 @@ load_dotenv()
 
 DATABASE_URL = os.getenv(
     "DATABASE_URL",
-    "postgresql://bletrack:bletrack_dev_password@localhost:5432/bletrack",
+    "postgresql://bletrack:bletrack_dev_password@localhost:5433/bletrack",
 )
 
 
@@ -40,6 +41,36 @@ def check_db_health() -> bool:
         return False
 
 
+def ensure_app_schema() -> None:
+    with get_db() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                CREATE TABLE IF NOT EXISTS fingerprint_registry (
+                    device_id TEXT PRIMARY KEY,
+                    fingerprint_value TEXT NOT NULL,
+                    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+                )
+                """
+            )
+
+
+def upsert_fingerprint(device_id: str, fingerprint_value: str) -> None:
+    with get_db() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                INSERT INTO fingerprint_registry (device_id, fingerprint_value, updated_at)
+                VALUES (%s, %s, NOW())
+                ON CONFLICT (device_id)
+                DO UPDATE SET
+                    fingerprint_value = EXCLUDED.fingerprint_value,
+                    updated_at = NOW()
+                """,
+                (device_id, fingerprint_value),
+            )
+
+
 def insert_presence_event(
     *,
     room: str,
@@ -65,7 +96,7 @@ def insert_presence_event(
                 )
                 VALUES (%s, %s, %s, %s, %s, %s, %s)
                 """,
-                (room, device_id, alias, distance_m, rssi, topic, payload),
+                (room, device_id, alias, distance_m, rssi, topic, Jsonb(payload)),
             )
 
 
@@ -75,11 +106,31 @@ def query_latest_presence(
     room: Optional[str] = None,
     device_id: Optional[str] = None,
     alias: Optional[str] = None,
+    paired_only: bool = False,
 ) -> List[Dict[str, Any]]:
+    conditions = []
+    params: List[Any] = []
+
+    if room is not None:
+        conditions.append("room = %s")
+        params.append(room)
+    if device_id is not None:
+        conditions.append("device_id = %s")
+        params.append(device_id)
+    if alias is not None:
+        conditions.append("alias = %s")
+        params.append(alias)
+    if paired_only:
+        conditions.append("device_id IN (SELECT device_id FROM fingerprint_registry)")
+
+    where_clause = ""
+    if conditions:
+        where_clause = "WHERE " + " AND ".join(conditions)
+
     with get_db() as conn:
         with conn.cursor() as cur:
             cur.execute(
-                """
+                f"""
                 WITH latest AS (
                     SELECT DISTINCT ON (device_id)
                         ts,
@@ -91,9 +142,7 @@ def query_latest_presence(
                         topic,
                         payload
                     FROM presence_events
-                    WHERE (%s IS NULL OR room = %s)
-                      AND (%s IS NULL OR device_id = %s)
-                      AND (%s IS NULL OR alias = %s)
+                    {where_clause}
                     ORDER BY device_id, ts DESC
                 )
                 SELECT *
@@ -101,7 +150,7 @@ def query_latest_presence(
                 ORDER BY ts DESC
                 LIMIT %s
                 """,
-                (room, room, device_id, device_id, alias, alias, limit),
+                [*params, limit],
             )
             rows = cur.fetchall()
             return [dict(row) for row in rows]
@@ -114,11 +163,29 @@ def query_presence_history(
     room: Optional[str] = None,
     device_id: Optional[str] = None,
     alias: Optional[str] = None,
+    paired_only: bool = False,
 ) -> List[Dict[str, Any]]:
+    conditions = ["ts >= NOW() - (%s * INTERVAL '1 minute')"]
+    params: List[Any] = [minutes]
+
+    if room is not None:
+        conditions.append("room = %s")
+        params.append(room)
+    if device_id is not None:
+        conditions.append("device_id = %s")
+        params.append(device_id)
+    if alias is not None:
+        conditions.append("alias = %s")
+        params.append(alias)
+    if paired_only:
+        conditions.append("device_id IN (SELECT device_id FROM fingerprint_registry)")
+
+    where_clause = "WHERE " + " AND ".join(conditions)
+
     with get_db() as conn:
         with conn.cursor() as cur:
             cur.execute(
-                """
+                f"""
                 SELECT
                     ts,
                     room,
@@ -129,14 +196,11 @@ def query_presence_history(
                     topic,
                     payload
                 FROM presence_events
-                WHERE ts >= NOW() - (%s * INTERVAL '1 minute')
-                  AND (%s IS NULL OR room = %s)
-                  AND (%s IS NULL OR device_id = %s)
-                  AND (%s IS NULL OR alias = %s)
+                {where_clause}
                 ORDER BY ts DESC
                 LIMIT %s
                 """,
-                (minutes, room, room, device_id, device_id, alias, alias, limit),
+                [*params, limit],
             )
             rows = cur.fetchall()
             return [dict(row) for row in rows]

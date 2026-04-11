@@ -253,3 +253,30 @@
 1775868624: New connection from 192.168.97.1:35148 on port 1883.
 1775868624: New client connected from 192.168.97.1:35148 as auto-D286BFB1-273F-5A61-B15B-1B2FB45FC527 (p4, c1, k60).
 1775868649: Client auto-D286BFB1-273F-5A61-B15B-1B2FB45FC527 [192.168.97.1:35148] disconnected.
+1775868675: New connection from 192.168.97.1:54492 on port 1883.
+1775868675: New client connected from 192.168.97.1:54492 as auto-927B323F-B67E-C13C-4046-36335688F3B9 (p4, c1, k60).
+1775868722: Client auto-927B323F-B67E-C13C-4046-36335688F3B9 [192.168.97.1:54492] disconnected.
+1775868727: New connection from 192.168.97.1:48292 on port 1883.
+1775868727: New client connected from 192.168.97.1:48292 as auto-96047565-4D1F-2B4E-CE1B-DCD5B3CF8771 (p4, c1, k60).
+1775868796: Client auto-96047565-4D1F-2B4E-CE1B-DCD5B3CF8771 [192.168.97.1:48292] disconnected.
+1775868797: New connection from 192.168.97.1:54366 on port 1883.
+1775868797: New client connected from 192.168.97.1:54366 as auto-DE12D41F-ECE4-7625-C69D-77FFCBF1BC1F (p4, c1, k60).
+1775868936: New connection from 192.168.97.1:46347 on port 1883.
+1775868936: Client espresense-sce [192.168.97.1:46929] disconnected: session taken over.
+1775868936: New client connected from 192.168.97.1:46347 as espresense-sce (p4, c1, k15).
+1775869130: Client auto-DE12D41F-ECE4-7625-C69D-77FFCBF1BC1F [192.168.97.1:54366] disconnected: connection closed by client.
+1775869131: New connection from 192.168.97.1:34968 on port 1883.
+1775869131: New client connected from 192.168.97.1:34968 as auto-93B62895-B447-849D-5F40-C14C7721DE60 (p4, c1, k60).
+1775869148: Client auto-93B62895-B447-849D-5F40-C14C7721DE60 [192.168.97.1:34968] disconnected.
+1775869149: New connection from 192.168.97.1:38264 on port 1883.
+1775869149: New client connected from 192.168.97.1:38264 as auto-618970CF-66CA-2AD0-074D-6A1A94C66658 (p4, c1, k60).
+1775869157: Client auto-618970CF-66CA-2AD0-074D-6A1A94C66658 [192.168.97.1:38264] disconnected: connection closed by client.
+1775869158: New connection from 192.168.97.1:39120 on port 1883.
+1775869158: New client connected from 192.168.97.1:39120 as auto-C008C250-1AEE-38C3-B5CE-0D13896D920D (p4, c1, k60).
+1775869184: Client auto-C008C250-1AEE-38C3-B5CE-0D13896D920D [192.168.97.1:39120] disconnected: connection closed by client.
+1775869187: New connection from 192.168.97.1:39280 on port 1883.
+1775869187: New client connected from 192.168.97.1:39280 as auto-0DED63E3-034F-058A-DDA3-E6CFC3581170 (p4, c1, k60).
+1775869320: Client auto-0DED63E3-034F-058A-DDA3-E6CFC3581170 [192.168.97.1:39280] disconnected.
+1775869327: New connection from 192.168.97.1:55672 on port 1883.
+1775869327: New client connected from 192.168.97.1:55672 as auto-59322C0F-9399-E1C1-4FF7-7CCCD4BABB10 (p4, c1, k60).
+1775869331: Client auto-59322C0F-9399-E1C1-4FF7-7CCCD4BABB10 [192.168.97.1:55672] disconnected.
