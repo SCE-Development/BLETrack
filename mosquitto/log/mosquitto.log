@@ -189,3 +189,67 @@
 1775753715: Saving in-memory database to /mosquitto/data//mosquitto.db.
 1775754488: mosquitto version 2.1.2 terminating
 1775754488: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1775866942: mosquitto version 2.1.2 starting
+1775866942: Config loaded from /mosquitto/config/mosquitto.conf.
+1775866942: Bridge support available.
+1775866942: Persistence support available.
+1775866942: TLS support available.
+1775866942: TLS-PSK support available.
+1775866942: Websockets support available.
+1775866942: Opening ipv4 listen socket on port 1883.
+1775866942: Opening ipv6 listen socket on port 1883.
+1775866942: Opening ipv4 listen socket on port 9001.
+1775866942: Opening ipv6 listen socket on port 9001.
+1775866942: mosquitto version 2.1.2 running
+1775866986: New connection from 192.168.97.1:54237 on port 1883.
+1775866986: New client connected from 192.168.97.1:54237 as espresense-sce (p4, c1, k15).
+1775867032: New connection from 192.168.97.1:33527 on port 1883.
+1775867032: Client espresense-sce [192.168.97.1:54237] disconnected: session taken over.
+1775867032: New client connected from 192.168.97.1:33527 as espresense-sce (p4, c1, k15).
+1775867085: New connection from 192.168.97.1:25120 on port 1883.
+1775867085: New client connected from 192.168.97.1:25120 as mqtt-explorer-f19104f5 (p4, c1, k60).
+1775867489: mosquitto version 2.1.2 terminating
+1775867489: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1775867540: mosquitto version 2.1.2 starting
+1775867540: Config loaded from /mosquitto/config/mosquitto.conf.
+1775867540: Bridge support available.
+1775867540: Persistence support available.
+1775867540: TLS support available.
+1775867540: TLS-PSK support available.
+1775867540: Websockets support available.
+1775867540: Opening ipv4 listen socket on port 1883.
+1775867540: Opening ipv6 listen socket on port 1883.
+1775867540: Opening ipv4 listen socket on port 9001.
+1775867540: Opening ipv6 listen socket on port 9001.
+1775867540: mosquitto version 2.1.2 running
+1775867540: New connection from 192.168.97.1:62820 on port 1883.
+1775867540: New client connected from 192.168.97.1:62820 as mqtt-explorer-f19104f5 (p4, c1, k60).
+1775867542: New connection from 192.168.97.1:26740 on port 1883.
+1775867542: New client connected from 192.168.97.1:26740 as espresense-sce (p4, c1, k15).
+1775868067: mosquitto version 2.1.2 terminating
+1775868067: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1775868089: mosquitto version 2.1.2 starting
+1775868089: Config loaded from /mosquitto/config/mosquitto.conf.
+1775868089: Bridge support available.
+1775868089: Persistence support available.
+1775868089: TLS support available.
+1775868089: TLS-PSK support available.
+1775868089: Websockets support available.
+1775868089: Opening ipv4 listen socket on port 1883.
+1775868089: Opening ipv6 listen socket on port 1883.
+1775868089: Opening ipv4 listen socket on port 9001.
+1775868089: Opening ipv6 listen socket on port 9001.
+1775868089: mosquitto version 2.1.2 running
+1775868090: New connection from 192.168.97.1:24337 on port 1883.
+1775868090: New client connected from 192.168.97.1:24337 as mqtt-explorer-f19104f5 (p4, c1, k60).
+1775868092: New connection from 192.168.97.1:39078 on port 1883.
+1775868092: New client connected from 192.168.97.1:39078 as espresense-sce (p4, c1, k15).
+1775868561: New connection from 192.168.97.1:46929 on port 1883.
+1775868561: Client espresense-sce [192.168.97.1:39078] disconnected: session taken over.
+1775868561: New client connected from 192.168.97.1:46929 as espresense-sce (p4, c1, k15).
+1775868617: New connection from 192.168.97.1:50734 on port 1883.
+1775868617: New client connected from 192.168.97.1:50734 as auto-472341CA-ED97-66E1-3D6C-A556F505D2D6 (p4, c1, k60).
+1775868623: Client auto-472341CA-ED97-66E1-3D6C-A556F505D2D6 [192.168.97.1:50734] disconnected.
+1775868624: New connection from 192.168.97.1:35148 on port 1883.
+1775868624: New client connected from 192.168.97.1:35148 as auto-D286BFB1-273F-5A61-B15B-1B2FB45FC527 (p4, c1, k60).
+1775868649: Client auto-D286BFB1-273F-5A61-B15B-1B2FB45FC527 [192.168.97.1:35148] disconnected.

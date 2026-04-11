@@ -41,3 +41,43 @@ Timeout: 60s (to prevent ghost presence).
 espresense/devices/+/sce - Wildcard topic for all room activity.
 
 espresense/settings/fingerprints/+ - Topic for remote enrollment of new IRKs.
+
+## TimescaleDB (Postgres) Setup
+
+This project includes a TimescaleDB container configured via `docker-compose.yml`.
+
+1. Copy environment defaults:
+   - `cp .env.example .env`
+2. Start infrastructure:
+   - `docker compose up -d`
+3. Verify DB is running:
+   - `docker ps`
+
+On first startup, `timescaledb-init.sql` is executed automatically and will:
+- Enable `timescaledb` extension
+- Create `presence_events` table
+- Convert it into a hypertable on `ts`
+- Create helpful indexes for query performance
+
+## API Endpoints
+
+- `GET /health`
+  - Reports API status, DB status, and MQTT ingester status.
+- `GET /enroll/start?device_type=phone&name=andrew`
+  - Triggers ESPresense enroll mode over websocket.
+- `GET /enroll/cancel`
+  - Cancels active ESPresense enroll mode.
+- `GET /presence/latest?limit=100&room=sce`
+  - Returns latest record per device.
+- `GET /presence/history?minutes=60&limit=1000&room=sce`
+  - Returns recent event history for dashboards/charts.
+
+## MQTT to DB Buffer
+
+When `main.py` starts, it launches an MQTT ingester thread that subscribes to `MQTT_TOPIC` and writes each message into `presence_events`.
+
+Default env values:
+- `MQTT_BROKER=localhost`
+- `MQTT_PORT=1883`
+- `MQTT_TOPIC=espresense/devices/+/+`
+- `RETENTION_DAYS=90`

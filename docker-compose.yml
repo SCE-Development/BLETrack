@@ -13,6 +13,25 @@ services:
     networks:
       - ble_net
 
+  timescaledb:
+    image: timescale/timescaledb:latest-pg16
+    container_name: bletrack-timescaledb
+    restart: always
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-bletrack}
+      POSTGRES_USER: ${POSTGRES_USER:-bletrack}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-bletrack_dev_password}
+    volumes:
+      - timescaledb_data:/var/lib/postgresql/data
+      - ./timescaledb-init.sql:/docker-entrypoint-initdb.d/001-timescaledb-init.sql:ro
+    networks:
+      - ble_net
+
 networks:
   ble_net:
     driver: bridge
+
+volumes:
+  timescaledb_data:
