@@ -294,3 +294,41 @@
 1775869717: New client connected from 192.168.97.1:51132 as auto-FD2FA2E1-ABDF-7FD9-2B1A-D3BDFED74315 (p4, c1, k60).
 1775869890: Saving in-memory database to /mosquitto/data//mosquitto.db.
 1775869972: Client auto-FD2FA2E1-ABDF-7FD9-2B1A-D3BDFED74315 [192.168.97.1:51132] disconnected.
+1775870131: New connection from 192.168.97.1:44896 on port 1883.
+1775870131: New client connected from 192.168.97.1:44896 as auto-90F64484-CBEB-46E7-7E38-15B6A8E9CAC1 (p4, c1, k60).
+1775870386: Client auto-90F64484-CBEB-46E7-7E38-15B6A8E9CAC1 [192.168.97.1:44896] disconnected.
+1775870388: New connection from 192.168.97.1:59326 on port 1883.
+1775870388: New client connected from 192.168.97.1:59326 as auto-D94B0233-EAD0-7498-F34C-7C7FAEF96DF6 (p4, c1, k60).
+1775870436: Client auto-D94B0233-EAD0-7498-F34C-7C7FAEF96DF6 [192.168.97.1:59326] disconnected.
+1775870437: New connection from 192.168.97.1:47064 on port 1883.
+1775870437: New client connected from 192.168.97.1:47064 as auto-BBAC50E7-A81D-EF39-B6D5-E9667CED7823 (p4, c1, k60).
+1775870480: Client auto-BBAC50E7-A81D-EF39-B6D5-E9667CED7823 [192.168.97.1:47064] disconnected: connection closed by client.
+1775870482: New connection from 192.168.97.1:56888 on port 1883.
+1775870482: New client connected from 192.168.97.1:56888 as auto-93A1BDEA-91BC-B742-BED7-BD8CF232E56C (p4, c1, k60).
+1775871145: New connection from 192.168.97.1:25550 on port 1883.
+1775871145: Client espresense-sce [192.168.97.1:46347] disconnected: session taken over.
+1775871145: New client connected from 192.168.97.1:25550 as espresense-sce (p4, c1, k15).
+1775871253: Client auto-93A1BDEA-91BC-B742-BED7-BD8CF232E56C [192.168.97.1:56888] disconnected.
+1775871254: New connection from 192.168.97.1:49168 on port 1883.
+1775871254: New client connected from 192.168.97.1:49168 as auto-749128CB-5842-CD3D-9E9A-614B9BC21682 (p4, c1, k60).
+1775871420: New connection from 192.168.97.1:17677 on port 1883.
+1775871420: Client espresense-sce [192.168.97.1:25550] disconnected: session taken over.
+1775871420: New client connected from 192.168.97.1:17677 as espresense-sce (p4, c1, k15).
+1775871696: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1775871903: mosquitto version 2.1.2 starting
+1775871903: Config loaded from /mosquitto/config/mosquitto.conf.
+1775871903: Bridge support available.
+1775871903: Persistence support available.
+1775871903: TLS support available.
+1775871903: TLS-PSK support available.
+1775871903: Websockets support available.
+1775871903: Opening ipv4 listen socket on port 1883.
+1775871903: Opening ipv6 listen socket on port 1883.
+1775871903: Opening ipv4 listen socket on port 9001.
+1775871903: Opening ipv6 listen socket on port 9001.
+1775871903: mosquitto version 2.1.2 running
+1775871905: New connection from 192.168.97.1:33020 on port 1883.
+1775871905: New client connected from 192.168.97.1:33020 as espresense-sce (p4, c1, k15).
+1775871917: New connection from 192.168.97.1:44320 on port 1883.
+1775871917: New client connected from 192.168.97.1:44320 as auto-45DA4CC6-4CC1-3944-3379-259646EA71F9 (p4, c1, k60).
+1775872433: Client auto-45DA4CC6-4CC1-3944-3379-259646EA71F9 [192.168.97.1:44320] disconnected.

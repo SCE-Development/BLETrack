@@ -53,6 +53,154 @@ def ensure_app_schema() -> None:
                 )
                 """
             )
+            cur.execute(
+                """
+                CREATE TABLE IF NOT EXISTS managed_devices (
+                    id BIGSERIAL PRIMARY KEY,
+                    display_name TEXT NOT NULL UNIQUE,
+                    device_type TEXT NOT NULL DEFAULT 'phone',
+                    observed_device_id TEXT NOT NULL,
+                    fingerprint_device_id TEXT,
+                    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+                    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+                )
+                """
+            )
+            cur.execute(
+                """
+                CREATE UNIQUE INDEX IF NOT EXISTS idx_managed_devices_fingerprint_device_id
+                ON managed_devices (fingerprint_device_id)
+                WHERE fingerprint_device_id IS NOT NULL
+                """
+            )
+            cur.execute(
+                """
+                CREATE INDEX IF NOT EXISTS idx_managed_devices_observed_device_id
+                ON managed_devices (observed_device_id)
+                """
+            )
+
+
+def upsert_managed_device(
+    *,
+    display_name: str,
+    observed_device_id: str,
+    device_type: str,
+    fingerprint_device_id: Optional[str],
+    is_active: bool,
+) -> Dict[str, Any]:
+    with get_db() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                INSERT INTO managed_devices (
+                    display_name,
+                    observed_device_id,
+                    device_type,
+                    fingerprint_device_id,
+                    is_active,
+                    updated_at
+                )
+                VALUES (%s, %s, %s, %s, %s, NOW())
+                ON CONFLICT (display_name)
+                DO UPDATE SET
+                    observed_device_id = EXCLUDED.observed_device_id,
+                    device_type = EXCLUDED.device_type,
+                    fingerprint_device_id = EXCLUDED.fingerprint_device_id,
+                    is_active = EXCLUDED.is_active,
+                    updated_at = NOW()
+                RETURNING
+                    id,
+                    display_name,
+                    observed_device_id,
+                    device_type,
+                    fingerprint_device_id,
+                    is_active,
+                    created_at,
+                    updated_at
+                """,
+                (
+                    display_name,
+                    observed_device_id,
+                    device_type,
+                    fingerprint_device_id,
+                    is_active,
+                ),
+            )
+            row = cur.fetchone()
+            return dict(row) if row else {}
+
+
+def list_managed_devices(limit: int = 500) -> List[Dict[str, Any]]:
+    with get_db() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                SELECT
+                    m.id,
+                    m.display_name,
+                    m.device_type,
+                    m.observed_device_id,
+                    m.fingerprint_device_id,
+                    m.is_active,
+                    m.created_at,
+                    m.updated_at,
+                    p.ts AS last_seen_ts,
+                    p.room AS last_seen_room,
+                    p.distance_m AS last_distance_m,
+                    p.rssi AS last_rssi
+                FROM managed_devices m
+                LEFT JOIN LATERAL (
+                    SELECT ts, room, distance_m, rssi
+                    FROM presence_events pe
+                    WHERE (
+                        pe.device_id = m.observed_device_id
+                        OR (
+                            m.fingerprint_device_id IS NOT NULL
+                            AND pe.device_id = m.fingerprint_device_id
+                        )
+                        OR (
+                            m.fingerprint_device_id IS NOT NULL
+                            AND split_part(m.fingerprint_device_id, ':', 1) = pe.device_id
+                        )
+                    )
+                    ORDER BY pe.ts DESC
+                    LIMIT 1
+                ) p ON TRUE
+                ORDER BY m.display_name ASC
+                LIMIT %s
+                """,
+                (limit,),
+            )
+            rows = cur.fetchall()
+            return [dict(row) for row in rows]
+
+
+def query_discovered_devices(limit: int = 500) -> List[Dict[str, Any]]:
+    with get_db() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                SELECT *
+                FROM (
+                    SELECT DISTINCT ON (device_id)
+                        device_id,
+                        payload->>'name' AS discovered_name,
+                        ts,
+                        room,
+                        distance_m,
+                        rssi
+                    FROM presence_events
+                    ORDER BY device_id, ts DESC
+                ) latest
+                ORDER BY ts DESC
+                LIMIT %s
+                """,
+                (limit,),
+            )
+            rows = cur.fetchall()
+            return [dict(row) for row in rows]
 
 
 def upsert_fingerprint(device_id: str, fingerprint_value: str) -> None:
@@ -124,6 +272,18 @@ def query_latest_presence(
         conditions.append(
             """
             (
+                device_id IN (
+                    SELECT observed_device_id
+                    FROM managed_devices
+                    WHERE is_active = TRUE
+                )
+                OR device_id IN (
+                    SELECT fingerprint_device_id
+                    FROM managed_devices
+                    WHERE is_active = TRUE
+                      AND fingerprint_device_id IS NOT NULL
+                )
+                OR
                 device_id IN (SELECT device_id FROM fingerprint_registry)
                 OR EXISTS (
                     SELECT 1
@@ -192,6 +352,18 @@ def query_presence_history(
         conditions.append(
             """
             (
+                device_id IN (
+                    SELECT observed_device_id
+                    FROM managed_devices
+                    WHERE is_active = TRUE
+                )
+                OR device_id IN (
+                    SELECT fingerprint_device_id
+                    FROM managed_devices
+                    WHERE is_active = TRUE
+                      AND fingerprint_device_id IS NOT NULL
+                )
+                OR
                 device_id IN (SELECT device_id FROM fingerprint_registry)
                 OR EXISTS (
                     SELECT 1

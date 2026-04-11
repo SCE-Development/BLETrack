@@ -1,0 +1,565 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BLETrack Device Manager</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --panel: #131a2e;
+      --panel-2: #1b2440;
+      --text: #edf2ff;
+      --muted: #9aa6c7;
+      --accent: #4da3ff;
+      --ok: #22c55e;
+      --warn: #f59e0b;
+      --err: #ef4444;
+      --border: #2a365f;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: radial-gradient(circle at 20% 0%, #1d2f59 0%, var(--bg) 42%);
+      color: var(--text);
+      font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    .wrap { max-width: 1200px; margin: 0 auto; padding: 24px; }
+    h1 { margin: 0 0 8px; font-size: 30px; }
+    p { margin: 0; color: var(--muted); }
+    .status {
+      margin-top: 16px;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--panel);
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      font-size: 14px;
+    }
+    .grid {
+      margin-top: 20px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .card {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: var(--panel);
+      padding: 16px;
+    }
+    .card h2 { margin: 0 0 12px; font-size: 18px; }
+    .toolbar { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+    button {
+      border: 1px solid var(--border);
+      background: var(--panel-2);
+      color: var(--text);
+      border-radius: 10px;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    button.primary { background: var(--accent); border-color: var(--accent); color: #051321; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    th, td {
+      text-align: left;
+      padding: 8px;
+      border-bottom: 1px solid #253152;
+      vertical-align: top;
+      word-break: break-word;
+    }
+    th { color: var(--muted); font-weight: 600; }
+    .form {
+      margin-top: 12px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .form label { display: grid; gap: 6px; font-size: 12px; color: var(--muted); }
+    .form input, .form select {
+      width: 100%;
+      border: 1px solid var(--border);
+      background: #0f1730;
+      color: var(--text);
+      border-radius: 8px;
+      padding: 8px;
+    }
+    .full { grid-column: 1 / -1; }
+    .msg { margin-top: 10px; font-size: 13px; color: var(--muted); min-height: 18px; }
+    .stack { display: grid; gap: 16px; }
+    .inline-form {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto auto;
+      gap: 8px;
+      align-items: end;
+    }
+    .inline-form label { display: grid; gap: 6px; font-size: 12px; color: var(--muted); }
+    .inline-form input, .inline-form select {
+      width: 100%;
+      border: 1px solid var(--border);
+      background: #0f1730;
+      color: var(--text);
+      border-radius: 8px;
+      padding: 8px;
+    }
+    .mono {
+      margin-top: 12px;
+      padding: 10px;
+      border: 1px solid #253152;
+      border-radius: 10px;
+      background: #0d142a;
+      color: #d5e2ff;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 12px;
+      max-height: 260px;
+      overflow: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .ok { color: var(--ok); }
+    .err { color: var(--err); }
+    @media (max-width: 960px) {
+      .grid { grid-template-columns: 1fr; }
+      .inline-form { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>BLETrack Device Manager</h1>
+    <p>Manage enrolled devices and inspect live discovered IDs.</p>
+
+    <div class="status" id="health"></div>
+
+    <div class="grid">
+      <section class="card stack">
+        <div>
+          <h2>Enrollment Controls</h2>
+          <div class="inline-form">
+            <label>
+              Device Type
+              <select id="enroll-device-type">
+                <option value="phone">phone</option>
+                <option value="watch">watch</option>
+                <option value="tablet">tablet</option>
+                <option value="other">other</option>
+              </select>
+            </label>
+            <label>
+              Enroll Name
+              <input id="enroll-name" placeholder="andrew_phone" value="new_device" />
+            </label>
+            <button class="primary" onclick="startEnroll()">Start Enroll</button>
+            <button onclick="cancelEnroll()">Cancel Enroll</button>
+          </div>
+          <div class="msg" id="enroll-msg"></div>
+        </div>
+
+        <div>
+          <h2>API Tester</h2>
+          <div class="toolbar">
+            <button onclick="testLatest()">/presence/latest</button>
+            <button onclick="testHistory()">/presence/history</button>
+            <button onclick="testFingerprints()">/debug/fingerprints</button>
+            <button onclick="testDiscovered()">/devices/discovered</button>
+            <button onclick="testManaged()">/devices/managed</button>
+          </div>
+          <div class="msg" id="tester-label">Response preview:</div>
+          <pre class="mono" id="tester-output">Run an endpoint to see JSON here.</pre>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Managed Devices</h2>
+        <div class="toolbar">
+          <button onclick="loadManaged()">Refresh</button>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Observed ID</th>
+              <th>Type</th>
+              <th>Last Seen</th>
+            </tr>
+          </thead>
+          <tbody id="managed-body"></tbody>
+        </table>
+
+        <form class="form" onsubmit="saveManaged(event)">
+          <label>
+            Display Name
+            <input id="display_name" required placeholder="andrew" />
+          </label>
+          <label>
+            Device Type
+            <select id="device_type">
+              <option value="phone">phone</option>
+              <option value="watch">watch</option>
+              <option value="tablet">tablet</option>
+              <option value="other">other</option>
+            </select>
+          </label>
+          <label class="full">
+            Observed Device ID (from discovered list)
+            <input id="observed_device_id" required placeholder="phone or e279fbde5c8b" />
+          </label>
+          <label class="full">
+            Fingerprint Device ID (optional, e.g. phone:andrew_ipad)
+            <input id="fingerprint_device_id" placeholder="phone:andrew_ipad" />
+          </label>
+          <label>
+            Active
+            <select id="is_active">
+              <option value="true">true</option>
+              <option value="false">false</option>
+            </select>
+          </label>
+          <div class="full">
+            <button class="primary" type="submit">Save Device</button>
+          </div>
+        </form>
+        <div class="msg" id="save-msg"></div>
+      </section>
+
+      <section class="card">
+        <h2>Discovered Devices</h2>
+        <div class="toolbar">
+          <button onclick="loadDiscovered()">Refresh</button>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Device ID</th>
+              <th>Name</th>
+              <th>Distance</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="discovered-body"></tbody>
+        </table>
+      </section>
+
+      <section class="card">
+        <h2>Enrolled Devices (Live)</h2>
+        <div class="toolbar">
+          <button onclick="loadEnrolled()">Refresh</button>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Enrolled ID</th>
+              <th>Live ID</th>
+              <th>Device Name</th>
+              <th>Alias</th>
+              <th>Room</th>
+              <th>Distance</th>
+              <th>Last Seen</th>
+            </tr>
+          </thead>
+          <tbody id="enrolled-body"></tbody>
+        </table>
+        <div class="msg" id="enrolled-msg"></div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    async function getJSON(path) {
+      const res = await fetch(path);
+      if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+      return res.json();
+    }
+
+    function safe(v) {
+      return (v === null || v === undefined || v === '') ? '-' : String(v);
+    }
+
+    function fmtTs(ts) {
+      if (!ts) return '-';
+      const d = new Date(ts);
+      if (Number.isNaN(d.getTime())) return ts;
+      return d.toLocaleString();
+    }
+
+    function rowDeviceName(row) {
+      if (!row || !row.payload || typeof row.payload !== 'object') return '-';
+      return safe(row.payload.name);
+    }
+
+    function normalizeId(value) {
+      return String(value || '').trim().toLowerCase();
+    }
+
+    function getBaseId(value) {
+      const normalized = normalizeId(value);
+      if (!normalized) return '';
+      const parts = normalized.split(':');
+      return parts[0] || normalized;
+    }
+
+    async function loadHealth() {
+      try {
+        const data = await getJSON('/health');
+        const ing = data.mqtt_ingester || {};
+        document.getElementById('health').innerHTML = `
+          <span>DB: <strong>${data.database_ok ? 'ok' : 'down'}</strong></span>
+          <span>MQTT: <strong>${ing.connected ? 'connected' : 'disconnected'}</strong></span>
+          <span>Processed: <strong>${safe(ing.processed_count)}</strong></span>
+          <span>Failed: <strong>${safe(ing.failed_count)}</strong></span>
+        `;
+      } catch (err) {
+        document.getElementById('health').innerHTML = `
+          <span style="color: var(--err);">API unreachable: ${safe(err.message)}</span>
+          <span>Open this UI from the API server URL (example: http://127.0.0.1:5055/)</span>
+        `;
+      }
+    }
+
+    function setMessage(id, text, cls) {
+      const el = document.getElementById(id);
+      el.textContent = text;
+      el.className = `msg ${cls || ''}`.trim();
+    }
+
+    function setTesterOutput(label, data) {
+      document.getElementById('tester-label').textContent = label;
+      document.getElementById('tester-output').textContent = JSON.stringify(data, null, 2);
+    }
+
+    async function startEnroll() {
+      const deviceType = document.getElementById('enroll-device-type').value.trim();
+      const name = document.getElementById('enroll-name').value.trim() || 'new_device';
+      setMessage('enroll-msg', 'Starting enrollment...', '');
+      try {
+        const params = new URLSearchParams({ device_type: deviceType, name });
+        const data = await getJSON(`/enroll/start?${params.toString()}`);
+        setTesterOutput('Response preview: GET /enroll/start', data);
+        if (data.ok === false) {
+          setMessage('enroll-msg', `Enroll start failed: ${data.message || 'unknown error'}`, 'err');
+          return;
+        }
+        setMessage('enroll-msg', 'Enrollment start command sent.', 'ok');
+      } catch (err) {
+        setMessage('enroll-msg', `Enroll start failed: ${err.message}`, 'err');
+      }
+    }
+
+    async function cancelEnroll() {
+      setMessage('enroll-msg', 'Canceling enrollment...', '');
+      try {
+        const data = await getJSON('/enroll/cancel');
+        setTesterOutput('Response preview: GET /enroll/cancel', data);
+        if (data.ok === false) {
+          setMessage('enroll-msg', `Enroll cancel failed: ${data.message || 'unknown error'}`, 'err');
+          return;
+        }
+        setMessage('enroll-msg', 'Enrollment canceled.', 'ok');
+      } catch (err) {
+        setMessage('enroll-msg', `Enroll cancel failed: ${err.message}`, 'err');
+      }
+    }
+
+    async function runTester(path) {
+      try {
+        const data = await getJSON(path);
+        setTesterOutput(`Response preview: GET ${path}`, data);
+      } catch (err) {
+        setTesterOutput(`Response preview: GET ${path}`, { ok: false, error: String(err.message || err) });
+      }
+    }
+
+    function testLatest() {
+      runTester('/presence/latest?limit=50');
+    }
+
+    function testHistory() {
+      runTester('/presence/history?minutes=60&limit=100');
+    }
+
+    function testFingerprints() {
+      runTester('/debug/fingerprints?limit=200');
+    }
+
+    function testDiscovered() {
+      runTester('/devices/discovered?limit=200');
+    }
+
+    function testManaged() {
+      runTester('/devices/managed?limit=200');
+    }
+
+    async function loadManaged() {
+      const data = await getJSON('/devices/managed');
+      const body = document.getElementById('managed-body');
+      body.innerHTML = '';
+      for (const row of data.data) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${safe(row.display_name)}${row.is_active ? '' : ' (inactive)'}</td>
+          <td>${safe(row.observed_device_id)}</td>
+          <td>${safe(row.device_type)}</td>
+          <td>${fmtTs(row.last_seen_ts)} ${row.last_distance_m != null ? `(${row.last_distance_m.toFixed(2)}m)` : ''}</td>
+        `;
+        body.appendChild(tr);
+      }
+    }
+
+    function useDeviceId(id) {
+      document.getElementById('observed_device_id').value = id;
+      document.getElementById('save-msg').textContent = `Selected ${id} for mapping.`;
+      document.getElementById('save-msg').className = 'msg';
+      document.getElementById('enroll-name').value = id.replace(/[:\s]+/g, '_');
+    }
+
+    async function loadDiscovered() {
+      const data = await getJSON('/devices/discovered?limit=200');
+      const body = document.getElementById('discovered-body');
+      body.innerHTML = '';
+      for (const row of data.data) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${safe(row.device_id)}</td>
+          <td>${safe(row.discovered_name)}</td>
+          <td>${row.distance_m != null ? `${row.distance_m.toFixed(2)}m` : '-'}</td>
+          <td><button onclick="useDeviceId('${String(row.device_id).replace(/'/g, "\\'")}')">Use</button></td>
+        `;
+        body.appendChild(tr);
+      }
+    }
+
+    async function loadEnrolled() {
+      const body = document.getElementById('enrolled-body');
+      const msg = document.getElementById('enrolled-msg');
+      body.innerHTML = '';
+      msg.textContent = '';
+      msg.className = 'msg';
+
+      try {
+        const [presenceResp, managedResp, fingerprintsResp] = await Promise.all([
+          getJSON('/presence/latest?limit=500'),
+          getJSON('/devices/managed?limit=500'),
+          getJSON('/debug/fingerprints?limit=500')
+        ]);
+
+        const presenceRows = Array.isArray(presenceResp.data) ? presenceResp.data : [];
+        const managedRows = Array.isArray(managedResp.data) ? managedResp.data.filter((r) => r.is_active) : [];
+        const fingerprintRows = Array.isArray(fingerprintsResp.data) ? fingerprintsResp.data : [];
+
+        const managedByObserved = new Map();
+        const managedByFingerprint = new Map();
+        for (const m of managedRows) {
+          const observed = normalizeId(m.observed_device_id);
+          const fingerprint = normalizeId(m.fingerprint_device_id);
+          const fingerprintBase = getBaseId(fingerprint);
+          if (observed) managedByObserved.set(observed, m.display_name);
+          if (fingerprint) managedByFingerprint.set(fingerprint, m.display_name);
+          if (fingerprintBase) managedByFingerprint.set(fingerprintBase, m.display_name);
+        }
+
+        const presenceById = new Map();
+        for (const row of presenceRows) {
+          const key = normalizeId(row.device_id);
+          if (key && !presenceById.has(key)) presenceById.set(key, row);
+        }
+
+        const enrolledIds = new Set();
+        for (const f of fingerprintRows) {
+          const key = normalizeId(f.device_id);
+          if (key) enrolledIds.add(key);
+        }
+        for (const m of managedRows) {
+          const fp = normalizeId(m.fingerprint_device_id);
+          const observed = normalizeId(m.observed_device_id);
+          if (fp) enrolledIds.add(fp);
+          else if (observed) enrolledIds.add(observed);
+        }
+
+        if (enrolledIds.size === 0) {
+          msg.textContent = 'No enrolled identities yet. Start enrollment to add one.';
+          return;
+        }
+
+        let liveCount = 0;
+        const sortedIds = Array.from(enrolledIds).sort((a, b) => a.localeCompare(b));
+        for (const enrolledId of sortedIds) {
+          const baseId = getBaseId(enrolledId);
+          const matchedRow = presenceById.get(enrolledId) || presenceById.get(baseId) || null;
+          if (matchedRow) liveCount += 1;
+
+          const mappedName = managedByFingerprint.get(enrolledId)
+            || managedByFingerprint.get(baseId)
+            || managedByObserved.get(enrolledId)
+            || managedByObserved.get(baseId)
+            || null;
+
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${safe(enrolledId)}</td>
+            <td>${safe(matchedRow ? matchedRow.device_id : '-')}</td>
+            <td>${matchedRow ? rowDeviceName(matchedRow) : '-'}</td>
+            <td>${safe(mappedName || (matchedRow ? matchedRow.alias : null))}</td>
+            <td>${safe(matchedRow ? matchedRow.room : null)}</td>
+            <td>${matchedRow && matchedRow.distance_m != null ? `${matchedRow.distance_m.toFixed(2)}m` : '-'}</td>
+            <td>${fmtTs(matchedRow ? matchedRow.ts : null)}</td>
+          `;
+          body.appendChild(tr);
+        }
+        msg.textContent = `Showing ${enrolledIds.size} enrolled device(s), ${liveCount} currently seen live.`;
+      } catch (err) {
+        msg.textContent = `Failed to load enrolled devices: ${err.message}`;
+        msg.className = 'msg err';
+      }
+    }
+
+    async function saveManaged(event) {
+      event.preventDefault();
+      const msg = document.getElementById('save-msg');
+      msg.textContent = 'Saving...';
+      msg.className = 'msg';
+
+      const payload = {
+        display_name: document.getElementById('display_name').value.trim(),
+        device_type: document.getElementById('device_type').value.trim(),
+        observed_device_id: document.getElementById('observed_device_id').value.trim(),
+        fingerprint_device_id: document.getElementById('fingerprint_device_id').value.trim() || null,
+        is_active: document.getElementById('is_active').value === 'true'
+      };
+
+      try {
+        const res = await fetch('/devices/managed', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+        await loadManaged();
+        await loadEnrolled();
+        msg.textContent = 'Saved successfully.';
+        msg.className = 'msg ok';
+      } catch (err) {
+        msg.textContent = `Save failed: ${err.message}`;
+        msg.className = 'msg err';
+      }
+    }
+
+    async function bootstrap() {
+      try {
+        await Promise.all([loadHealth(), loadManaged(), loadDiscovered(), loadEnrolled()]);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    bootstrap();
+    setInterval(loadHealth, 3000);
+    setInterval(loadEnrolled, 5000);
+  </script>
+</body>
+</html>

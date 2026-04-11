@@ -71,6 +71,12 @@ On first startup, `timescaledb-init.sql` is executed automatically and will:
   - Returns latest record per device.
 - `GET /presence/history?minutes=60&limit=1000&room=sce&paired_only=true`
   - Returns recent event history for dashboards/charts.
+- `GET /devices/discovered`
+  - Returns latest seen device ids from raw presence stream.
+- `GET /devices/managed`
+  - Returns managed/enrolled device mappings with last seen data.
+- `POST /devices/managed`
+  - Upserts a managed device mapping (`display_name`, `observed_device_id`, etc.).
 
 ## MQTT to DB Buffer
 
@@ -83,3 +89,9 @@ Default env values:
 - `RETENTION_DAYS=90`
 
 Paired-device filtering uses `fingerprint_registry`, populated automatically from retained fingerprint topics under `espresense/settings/fingerprints/+`.
+
+## Simple Frontend
+
+- Open `http://localhost:5055/` for a simple device manager UI.
+- Use discovered IDs to map users in `managed_devices`.
+- This is an interim HTML frontend before a full React app.
