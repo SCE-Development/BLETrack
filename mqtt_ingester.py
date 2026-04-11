@@ -5,14 +5,14 @@ from typing import Any, Dict, Optional
 
 import paho.mqtt.client as mqtt
 
-from db import insert_presence_event
+from db import insert_presence_event, upsert_fingerprint
 
 
 class MQTTIngester:
     def __init__(self) -> None:
         self.broker = self._env_or_default("MQTT_BROKER", "localhost")
         self.port = int(self._env_or_default("MQTT_PORT", "1883"))
-        self.topic = self._env_or_default("MQTT_TOPIC", "espresense/devices/+/+")
+        self.topic = self._env_or_default("MQTT_TOPIC", "espresense/#")
         self._client = mqtt.Client()
         self._client.on_connect = self._on_connect
         self._client.on_message = self._on_message
@@ -72,8 +72,21 @@ class MQTTIngester:
         self, client: mqtt.Client, userdata: Any, msg: mqtt.MQTTMessage
     ) -> None:
         try:
-            parsed = self._safe_json(msg.payload)
             topic = msg.topic
+            parsed = self._safe_json(msg.payload)
+
+            if topic.startswith("espresense/settings/fingerprints/"):
+                device_id = topic.split("espresense/settings/fingerprints/", 1)[1]
+                fingerprint_value = self._decode_payload(msg.payload)
+                if device_id and fingerprint_value:
+                    upsert_fingerprint(
+                        device_id=device_id, fingerprint_value=fingerprint_value
+                    )
+                return
+
+            if not topic.startswith("espresense/devices/"):
+                return
+
             room, device_id, alias = self._parse_topic(topic)
             distance_m = (
                 self._as_float(parsed.get("distance"))
@@ -105,6 +118,13 @@ class MQTTIngester:
             return json.loads(raw.decode("utf-8"))
         except Exception:
             return {}
+
+    @staticmethod
+    def _decode_payload(raw: bytes) -> str:
+        try:
+            return raw.decode("utf-8").strip()
+        except Exception:
+            return ""
 
     @staticmethod
     def _as_float(value: Any) -> Optional[float]:

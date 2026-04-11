@@ -7,7 +7,9 @@ from dotenv import load_dotenv
 
 from db import (
     check_db_health,
+    ensure_app_schema,
     ensure_retention_policy,
+    query_fingerprint_registry,
     query_latest_presence,
     query_presence_history,
 )
@@ -28,6 +30,7 @@ ingester = MQTTIngester()
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
+    ensure_app_schema()
     ensure_retention_policy(RETENTION_DAYS)
     ingester.start()
     yield
@@ -89,12 +92,14 @@ def presence_latest(
     room: Optional[str] = Query(default=None),
     device_id: Optional[str] = Query(default=None),
     alias: Optional[str] = Query(default=None),
+    paired_only: bool = Query(default=False),
 ) -> dict:
     rows = query_latest_presence(
         limit=limit,
         room=room,
         device_id=device_id,
         alias=alias,
+        paired_only=paired_only,
     )
     return {
         "ok": True,
@@ -110,6 +115,7 @@ def presence_history(
     room: Optional[str] = Query(default=None),
     device_id: Optional[str] = Query(default=None),
     alias: Optional[str] = Query(default=None),
+    paired_only: bool = Query(default=False),
 ) -> dict:
     rows = query_presence_history(
         minutes=minutes,
@@ -117,11 +123,22 @@ def presence_history(
         room=room,
         device_id=device_id,
         alias=alias,
+        paired_only=paired_only,
     )
     return {
         "ok": True,
         "count": len(rows),
         "minutes": minutes,
+        "data": rows,
+    }
+
+
+@app.get("/debug/fingerprints")
+def debug_fingerprints(limit: int = Query(default=200, ge=1, le=2000)) -> dict:
+    rows = query_fingerprint_registry(limit=limit)
+    return {
+        "ok": True,
+        "count": len(rows),
         "data": rows,
     }
 

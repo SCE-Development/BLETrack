@@ -121,7 +121,18 @@ def query_latest_presence(
         conditions.append("alias = %s")
         params.append(alias)
     if paired_only:
-        conditions.append("device_id IN (SELECT device_id FROM fingerprint_registry)")
+        conditions.append(
+            """
+            (
+                device_id IN (SELECT device_id FROM fingerprint_registry)
+                OR EXISTS (
+                    SELECT 1
+                    FROM fingerprint_registry fr
+                    WHERE split_part(fr.device_id, ':', 1) = presence_events.device_id
+                )
+            )
+            """
+        )
 
     where_clause = ""
     if conditions:
@@ -178,7 +189,18 @@ def query_presence_history(
         conditions.append("alias = %s")
         params.append(alias)
     if paired_only:
-        conditions.append("device_id IN (SELECT device_id FROM fingerprint_registry)")
+        conditions.append(
+            """
+            (
+                device_id IN (SELECT device_id FROM fingerprint_registry)
+                OR EXISTS (
+                    SELECT 1
+                    FROM fingerprint_registry fr
+                    WHERE split_part(fr.device_id, ':', 1) = presence_events.device_id
+                )
+            )
+            """
+        )
 
     where_clause = "WHERE " + " AND ".join(conditions)
 
@@ -201,6 +223,22 @@ def query_presence_history(
                 LIMIT %s
                 """,
                 [*params, limit],
+            )
+            rows = cur.fetchall()
+            return [dict(row) for row in rows]
+
+
+def query_fingerprint_registry(limit: int = 200) -> List[Dict[str, Any]]:
+    with get_db() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                SELECT device_id, fingerprint_value, updated_at
+                FROM fingerprint_registry
+                ORDER BY updated_at DESC
+                LIMIT %s
+                """,
+                (limit,),
             )
             rows = cur.fetchall()
             return [dict(row) for row in rows]

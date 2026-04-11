@@ -67,9 +67,9 @@ On first startup, `timescaledb-init.sql` is executed automatically and will:
   - Triggers ESPresense enroll mode over websocket.
 - `GET /enroll/cancel`
   - Cancels active ESPresense enroll mode.
-- `GET /presence/latest?limit=100&room=sce`
+- `GET /presence/latest?limit=100&room=sce&paired_only=true`
   - Returns latest record per device.
-- `GET /presence/history?minutes=60&limit=1000&room=sce`
+- `GET /presence/history?minutes=60&limit=1000&room=sce&paired_only=true`
   - Returns recent event history for dashboards/charts.
 
 ## MQTT to DB Buffer
@@ -79,5 +79,7 @@ When `main.py` starts, it launches an MQTT ingester thread that subscribes to `M
 Default env values:
 - `MQTT_BROKER=localhost`
 - `MQTT_PORT=1883`
-- `MQTT_TOPIC=espresense/devices/+/+`
+- `MQTT_TOPIC=espresense/#`
 - `RETENTION_DAYS=90`
+
+Paired-device filtering uses `fingerprint_registry`, populated automatically from retained fingerprint topics under `espresense/settings/fingerprints/+`.

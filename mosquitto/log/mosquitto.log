@@ -280,3 +280,17 @@
 1775869327: New connection from 192.168.97.1:55672 on port 1883.
 1775869327: New client connected from 192.168.97.1:55672 as auto-59322C0F-9399-E1C1-4FF7-7CCCD4BABB10 (p4, c1, k60).
 1775869331: Client auto-59322C0F-9399-E1C1-4FF7-7CCCD4BABB10 [192.168.97.1:55672] disconnected.
+1775869526: New connection from 192.168.97.1:33936 on port 1883.
+1775869526: New client connected from 192.168.97.1:33936 as auto-32960997-999A-3329-3FA4-8ACE2F281758 (p4, c1, k60).
+1775869636: Client mqtt-explorer-f19104f5 [192.168.97.1:24337] disconnected.
+1775869655: Client auto-32960997-999A-3329-3FA4-8ACE2F281758 [192.168.97.1:33936] disconnected.
+1775869656: New connection from 192.168.97.1:43522 on port 1883.
+1775869656: New client connected from 192.168.97.1:43522 as auto-8E9547B9-D932-8606-56CA-79FC8ACE81B6 (p4, c1, k60).
+1775869708: Client auto-8E9547B9-D932-8606-56CA-79FC8ACE81B6 [192.168.97.1:43522] disconnected.
+1775869709: New connection from 192.168.97.1:33452 on port 1883.
+1775869709: New client connected from 192.168.97.1:33452 as auto-12ADC29D-E0C6-BD97-C970-B1263C827C28 (p4, c1, k60).
+1775869716: Client auto-12ADC29D-E0C6-BD97-C970-B1263C827C28 [192.168.97.1:33452] disconnected: connection closed by client.
+1775869717: New connection from 192.168.97.1:51132 on port 1883.
+1775869717: New client connected from 192.168.97.1:51132 as auto-FD2FA2E1-ABDF-7FD9-2B1A-D3BDFED74315 (p4, c1, k60).
+1775869890: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1775869972: Client auto-FD2FA2E1-ABDF-7FD9-2B1A-D3BDFED74315 [192.168.97.1:51132] disconnected.
