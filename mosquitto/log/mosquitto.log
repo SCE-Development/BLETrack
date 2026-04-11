@@ -332,3 +332,68 @@
 1775871917: New connection from 192.168.97.1:44320 on port 1883.
 1775871917: New client connected from 192.168.97.1:44320 as auto-45DA4CC6-4CC1-3944-3379-259646EA71F9 (p4, c1, k60).
 1775872433: Client auto-45DA4CC6-4CC1-3944-3379-259646EA71F9 [192.168.97.1:44320] disconnected.
+1775872769: Client espresense-sce [192.168.97.1:33020] disconnected: exceeded timeout.
+1775872772: New connection from 192.168.97.1:28660 on port 1883.
+1775872772: New client connected from 192.168.97.1:28660 as espresense-sce (p4, c1, k15).
+1775872796: Client espresense-sce [192.168.97.1:28660] disconnected: exceeded timeout.
+1775872799: New connection from 192.168.97.1:32828 on port 1883.
+1775872799: New client connected from 192.168.97.1:32828 as espresense-sce (p4, c1, k15).
+1775874333: Client espresense-sce [192.168.97.1:32828] disconnected: exceeded timeout.
+1775874333: New connection from 192.168.97.1:60085 on port 1883.
+1775874333: New connection from 192.168.97.1:42824 on port 1883.
+1775874333: New connection from 192.168.97.1:62731 on port 1883.
+1775874333: New client connected from 192.168.97.1:60085 as espresense-sce (p4, c1, k15).
+1775874333: Client espresense-sce [192.168.97.1:60085] disconnected: session taken over.
+1775874333: New client connected from 192.168.97.1:42824 as espresense-sce (p4, c1, k15).
+1775874333: Client espresense-sce [192.168.97.1:42824] disconnected: session taken over.
+1775874333: New client connected from 192.168.97.1:62731 as espresense-sce (p4, c1, k15).
+1775874333: New connection from 192.168.97.1:38563 on port 1883.
+1775874333: Client espresense-sce [192.168.97.1:62731] disconnected: session taken over.
+1775874333: New client connected from 192.168.97.1:38563 as espresense-sce (p4, c1, k15).
+1775874356: Client espresense-sce [192.168.97.1:38563] disconnected: exceeded timeout.
+1775874360: New connection from 192.168.97.1:61866 on port 1883.
+1775874391: Client 192.168.97.1 [192.168.97.1:61866] disconnected: exceeded timeout.
+1775874395: New connection from 192.168.97.1:31439 on port 1883.
+1775874395: New client connected from 192.168.97.1:31439 as espresense-sce (p4, c1, k15).
+1775874417: Client espresense-sce [192.168.97.1:31439] disconnected: exceeded timeout.
+1775874421: New connection from 192.168.97.1:55891 on port 1883.
+1775874421: New client connected from 192.168.97.1:55891 as espresense-sce (p4, c1, k15).
+1775874421: Invalid PUBLISH (QoS=0 and DUP=1) from espresense-sce, disconnecting.
+1775874421: Client espresense-sce [192.168.97.1:55891] disconnected: malformed packet.
+1775874424: New connection from 192.168.97.1:56326 on port 1883.
+1775874424: New client connected from 192.168.97.1:56326 as espresense-sce (p4, c1, k15).
+1775874446: Client espresense-sce [192.168.97.1:56326] disconnected: exceeded timeout.
+1775874450: New connection from 192.168.97.1:26085 on port 1883.
+1775874450: New client connected from 192.168.97.1:26085 as espresense-sce (p4, c1, k15).
+1775874450: Invalid PUBLISH (QoS=0 and DUP=1) from espresense-sce, disconnecting.
+1775874450: Client espresense-sce [192.168.97.1:26085] disconnected: malformed packet.
+1775874453: New connection from 192.168.97.1:19557 on port 1883.
+1775874453: New client connected from 192.168.97.1:19557 as espresense-sce (p4, c1, k15).
+1775874475: Client espresense-sce [192.168.97.1:19557] disconnected: exceeded timeout.
+1775874479: New connection from 192.168.97.1:43807 on port 1883.
+1775874479: New client connected from 192.168.97.1:43807 as espresense-sce (p4, c1, k15).
+1775874479: Invalid PUBLISH (QoS=0 and DUP=1) from espresense-sce, disconnecting.
+1775874479: Client espresense-sce [192.168.97.1:43807] disconnected: malformed packet.
+1775874482: New connection from 192.168.97.1:35122 on port 1883.
+1775874482: New client connected from 192.168.97.1:35122 as espresense-sce (p4, c1, k15).
+1775874504: Client espresense-sce [192.168.97.1:35122] disconnected: exceeded timeout.
+1775874508: New connection from 192.168.97.1:51117 on port 1883.
+1775874508: New client connected from 192.168.97.1:51117 as espresense-sce (p4, c1, k15).
+1775874508: Invalid PUBLISH (QoS=0 and DUP=1) from espresense-sce, disconnecting.
+1775874508: Client espresense-sce [192.168.97.1:51117] disconnected: malformed packet.
+1775874511: New connection from 192.168.97.1:40033 on port 1883.
+1775874511: New client connected from 192.168.97.1:40033 as espresense-sce (p4, c1, k15).
+1775874533: Client espresense-sce [192.168.97.1:40033] disconnected: exceeded timeout.
+1775874537: New connection from 192.168.97.1:18976 on port 1883.
+1775874537: New client connected from 192.168.97.1:18976 as espresense-sce (p4, c1, k15).
+1775874537: Invalid PUBLISH (QoS=0 and DUP=1) from espresense-sce, disconnecting.
+1775874537: Client espresense-sce [192.168.97.1:18976] disconnected: malformed packet.
+1775874540: New connection from 192.168.97.1:61139 on port 1883.
+1775874540: New client connected from 192.168.97.1:61139 as espresense-sce (p4, c1, k15).
+1775874562: Client espresense-sce [192.168.97.1:61139] disconnected: exceeded timeout.
+1775874566: New connection from 192.168.97.1:36394 on port 1883.
+1775874566: New client connected from 192.168.97.1:36394 as espresense-sce (p4, c1, k15).
+1775874566: Invalid PUBLISH (QoS=0 and DUP=1) from espresense-sce, disconnecting.
+1775874566: Client espresense-sce [192.168.97.1:36394] disconnected: malformed packet.
+1775874569: New connection from 192.168.97.1:33924 on port 1883.
+1775874569: New client connected from 192.168.97.1:33924 as espresense-sce (p4, c1, k15).

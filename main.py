@@ -26,7 +26,7 @@ from mqtt_ingester import MQTTIngester
 load_dotenv()
 
 
-ESPRESENSE_BASE_URL = os.getenv("ESPRESENSE_BASE_URL", "http://10.251.10.179")
+ESPRESENSE_BASE_URL = os.getenv("ESPRESENSE_BASE_URL", "http://10.251.212.248")
 ESPRESENSE_TIMEOUT_SECONDS = float(os.getenv("ESPRESENSE_TIMEOUT_SECONDS", "5.0"))
 RETENTION_DAYS = int(os.getenv("RETENTION_DAYS", "90"))
 

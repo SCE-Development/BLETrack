@@ -1,97 +1,112 @@
-SCE Room Presence Server
-A real-time indoor positioning server built for the SCE Lab at SJSU. This project uses BLE (Bluetooth Low Energy) and MQTT to track student presence and proximity within the lab environment.
+BLETrack
 
-🚀 Tech Stack
-Hardware: ESP32 running ESPresense.
+BLETrack is a FastAPI service for tracking BLE presence data from ESPresense through MQTT, storing it in TimescaleDB, and exposing a simple web dashboard for enrollment and device mapping.
 
-Broker: Mosquitto MQTT running in a Docker container.
+## Architecture (Brief)
 
-Automation/UI: Home Assistant (via manual MQTT sensors).
+The data flow is:
 
-Protocol: MQTT (Publish/Subscribe) with JSON payloads.
+1. ESPresense publishes device observations and fingerprint topics to MQTT.
+2. A background MQTT ingester in the API subscribes to `espresense/#`.
+3. Presence events are written to `presence_events` (Timescale hypertable).
+4. Fingerprint topics are written to `fingerprint_registry`.
+5. The FastAPI app exposes endpoints for health, enrollment, presence queries, and managed device mappings.
+6. `index.html` (served by FastAPI) calls those endpoints for live monitoring and admin actions.
 
-🏗 System Architecture
-ESP32 Nodes: Scan for specific IRK (Identity Resolving Keys) from registered mobile devices.
+Core components:
 
-MQTT Broker: Receives distance and RSSI data on the topic espresense/devices/phone:<user>/sce.
+- `main.py`: FastAPI app and HTTP routes.
+- `mqtt_ingester.py`: MQTT subscriber and DB writes.
+- `db.py`: schema setup and SQL queries.
+- `espresense_wrapper.py`: calls ESPresense enrollment APIs.
+- `index.html`: lightweight dashboard UI.
 
-Clients:
+## Tech Stack
 
-Home Assistant: Triggers automations (e.g., entrance notifications) based on distance thresholds.
+- Python 3 + FastAPI
+- PostgreSQL + TimescaleDB
+- Mosquitto MQTT broker
+- ESPresense nodes (ESP32)
+- Plain HTML/JS dashboard (served at `/`)
 
-Web Wrapper: A custom JavaScript frontend that subscribes directly to the MQTT wildcard topic for real-time dashboarding.
+## Quick Start
 
-🛠 Setup & Installation
-Docker (MQTT Broker)
-Bash
-docker run -d \
-  --name=mosquitto \
-  -p 1883:1883 \
-  -p 9001:9001 \
-  -v $(pwd)/mosquitto.conf:/mosquitto/config/mosquitto.conf \
-  eclipse-mosquitto
-ESPresense Configuration
-Room Name: SCE
+1. Create local env file:
 
-Target IDs: Filtered to phone:andrew (and registered peers).
+```bash
+cp .env.example .env
+```
 
-Timeout: 60s (to prevent ghost presence).
-
-📡 MQTT Topic Structure
-espresense/devices/+/sce - Wildcard topic for all room activity.
-
-espresense/settings/fingerprints/+ - Topic for remote enrollment of new IRKs.
-
-## TimescaleDB (Postgres) Setup
-
-This project includes a TimescaleDB container configured via `docker-compose.yml`.
-
-1. Copy environment defaults:
-   - `cp .env.example .env`
 2. Start infrastructure:
-   - `docker compose up -d`
-3. Verify DB is running:
-   - `docker ps`
 
-On first startup, `timescaledb-init.sql` is executed automatically and will:
-- Enable `timescaledb` extension
-- Create `presence_events` table
-- Convert it into a hypertable on `ts`
-- Create helpful indexes for query performance
+```bash
+docker compose up -d
+```
+
+3. Run the API:
+
+```bash
+python main.py
+```
+
+4. Open the dashboard:
+
+- `http://localhost:5055/`
+
+## MQTT Topics
+
+- Presence stream: `espresense/devices/+/+`
+- Fingerprint registry: `espresense/settings/fingerprints/+`
+
+Notes:
+
+- Presence payloads are stored as raw JSON in `presence_events.payload`.
+- Fingerprint topics are used to determine paired/enrolled identities.
+
+## Database Notes
+
+`timescaledb-init.sql` initializes the main time-series table (`presence_events`) and indexes.
+
+App-managed tables:
+
+- `fingerprint_registry`: latest fingerprint value by fingerprint device ID.
+- `managed_devices`: user-defined mapping between observed IDs and friendly names/types.
+
+Retention:
+
+- `RETENTION_DAYS` controls data retention policy for `presence_events` (default: `90`).
 
 ## API Endpoints
 
 - `GET /health`
-  - Reports API status, DB status, and MQTT ingester status.
-- `GET /enroll/start?device_type=phone&name=andrew`
-  - Triggers ESPresense enroll mode over websocket.
+  - Service, DB, and MQTT ingester status.
+- `GET /enroll/start?device_type=phone&name=my_device`
+  - Starts ESPresense enrollment mode.
 - `GET /enroll/cancel`
-  - Cancels active ESPresense enroll mode.
+  - Cancels enrollment mode.
 - `GET /presence/latest?limit=100&room=sce&paired_only=true`
-  - Returns latest record per device.
+  - Latest event per `device_id`.
 - `GET /presence/history?minutes=60&limit=1000&room=sce&paired_only=true`
-  - Returns recent event history for dashboards/charts.
-- `GET /devices/discovered`
-  - Returns latest seen device ids from raw presence stream.
-- `GET /devices/managed`
-  - Returns managed/enrolled device mappings with last seen data.
+  - Presence history window.
+- `GET /debug/fingerprints?limit=200`
+  - Fingerprint registry rows.
+- `GET /devices/discovered?limit=500`
+  - Latest discovered raw device IDs.
+- `GET /devices/managed?limit=500`
+  - Managed mappings with last-seen join.
 - `POST /devices/managed`
-  - Upserts a managed device mapping (`display_name`, `observed_device_id`, etc.).
+  - Upserts managed mapping (`display_name`, `observed_device_id`, `device_type`, `fingerprint_device_id`, `is_active`).
 
-## MQTT to DB Buffer
+## Configuration
 
-When `main.py` starts, it launches an MQTT ingester thread that subscribes to `MQTT_TOPIC` and writes each message into `presence_events`.
+Common environment variables:
 
-Default env values:
-- `MQTT_BROKER=localhost`
-- `MQTT_PORT=1883`
-- `MQTT_TOPIC=espresense/#`
-- `RETENTION_DAYS=90`
+- `DATABASE_URL`
+- `MQTT_BROKER` (default: `localhost`)
+- `MQTT_PORT` (default: `1883`)
+- `MQTT_TOPIC` (default: `espresense/#`)
+- `ESPRESENSE_BASE_URL`
+- `ESPRESENSE_TIMEOUT_SECONDS` (default: `5.0`)
+- `RETENTION_DAYS` (default: `90`)
 
-Paired-device filtering uses `fingerprint_registry`, populated automatically from retained fingerprint topics under `espresense/settings/fingerprints/+`.
-
-## Simple Frontend
-
-- Open `http://localhost:5055/` for a simple device manager UI.
-- Use discovered IDs to map users in `managed_devices`.
-- This is an interim HTML frontend before a full React app.
+See `.env.example` for the full template.
