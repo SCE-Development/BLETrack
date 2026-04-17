@@ -1,10 +1,12 @@
 services:
   api:
-    image: python:3.11-slim
+    build:
+      context: .
+      dockerfile: api/Dockerfile
     container_name: bletrack-api
     restart: always
     working_dir: /app
-    command: sh -c "pip install --no-cache-dir -r requirements.txt && uvicorn main:app --host 0.0.0.0 --port 5055"
+    command: uvicorn api.server:app --host 0.0.0.0 --port 5055
     env_file:
       - .env
     environment:
@@ -47,7 +49,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-bletrack_dev_password}
     volumes:
       - timescaledb_data:/var/lib/postgresql/data
-      - ./timescaledb-init.sql:/docker-entrypoint-initdb.d/001-timescaledb-init.sql:ro
+      - ./db/init/timescaledb-init.sql:/docker-entrypoint-initdb.d/001-timescaledb-init.sql:ro
     networks:
       - ble_net
 

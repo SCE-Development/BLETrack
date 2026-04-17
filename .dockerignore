@@ -1,13 +1,8 @@
-# env
+.git
+.gitignore
 .env
 .env.*
 !.env.example
-
-# venv
-venv/
-.venv/
-env/
-
 __pycache__/
 *.py[cod]
 .pytest_cache/
@@ -15,14 +10,10 @@ __pycache__/
 .ruff_cache/
 .coverage
 htmlcov/
-
-
-.DS_Store
-.idea/
-.vscode/
-
-*.log
-mosquitto/log/
+venv/
+.venv/
+env/
 mosquitto/data/
-
+mosquitto/log/
+*.log
 config/config.json

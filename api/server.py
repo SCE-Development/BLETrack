@@ -1,6 +1,7 @@
 import os
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Optional
 
 from fastapi import FastAPI, Query
@@ -9,7 +10,7 @@ from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 from dotenv import load_dotenv
 
-from db import (
+from modules.db import (
     check_db_health,
     ensure_app_schema,
     ensure_retention_policy,
@@ -22,11 +23,15 @@ from db import (
     set_managed_device_active,
     upsert_managed_device,
 )
-from espresense_wrapper import ESPresenseWrapper, ESPresenseWrapperError
-from mqtt_ingester import MQTTIngester
+from modules.espresense_wrapper import ESPresenseWrapper, ESPresenseWrapperError
+from modules.mqtt_ingester import MQTTIngester
 
 
 load_dotenv()
+
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+INDEX_HTML_PATH = BASE_DIR / "static" / "index.html"
 
 
 ESPRESENSE_BASE_URL = os.getenv("ESPRESENSE_BASE_URL", "http://10.251.212.248")
@@ -89,7 +94,7 @@ class DeviceRemoveRequest(BaseModel):
 
 @app.get("/")
 def root() -> FileResponse:
-    return FileResponse("index.html")
+    return FileResponse(INDEX_HTML_PATH)
 
 
 @app.get("/health")
@@ -436,4 +441,4 @@ def upsert_device(payload: ManagedDeviceUpsertRequest) -> dict:
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run("main:app", host="0.0.0.0", port=5055, reload=True)
+    uvicorn.run("api.server:app", host="0.0.0.0", port=5055, reload=True)

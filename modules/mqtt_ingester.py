@@ -5,7 +5,7 @@ from typing import Any, Dict, Optional
 
 import paho.mqtt.client as mqtt
 
-from db import insert_presence_event, upsert_fingerprint
+from modules.db import insert_presence_event, upsert_fingerprint
 
 
 class MQTTIngester:

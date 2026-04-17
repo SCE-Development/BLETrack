@@ -11,15 +11,15 @@ The data flow is:
 3. Presence events are written to `presence_events` (Timescale hypertable).
 4. Fingerprint topics are written to `fingerprint_registry`.
 5. The FastAPI app exposes endpoints for health, enrollment, presence queries, and managed device mappings.
-6. `index.html` (served by FastAPI) calls those endpoints for live monitoring and admin actions.
+6. `static/index.html` (served by FastAPI) calls those endpoints for live monitoring and admin actions.
 
 Core components:
 
-- `main.py`: FastAPI app and HTTP routes.
-- `mqtt_ingester.py`: MQTT subscriber and DB writes.
-- `db.py`: schema setup and SQL queries.
-- `espresense_wrapper.py`: calls ESPresense enrollment APIs.
-- `index.html`: lightweight dashboard UI.
+- `api/server.py`: FastAPI app and HTTP routes.
+- `modules/mqtt_ingester.py`: MQTT subscriber and DB writes.
+- `modules/db.py`: schema setup and SQL queries.
+- `modules/espresense_wrapper.py`: calls ESPresense enrollment APIs.
+- `static/index.html`: lightweight dashboard UI.
 
 ## Tech Stack
 
@@ -43,15 +43,33 @@ cp .env.example .env
 docker compose up -d
 ```
 
-3. Run the API:
+3. Run only infrastructure (optional) and start API locally:
 
 ```bash
-python main.py
+python -m api.server
 ```
 
 4. Open the dashboard:
 
 - `http://localhost:5055/`
+
+## Docker API Build
+
+The API has a dedicated `Dockerfile` and dependencies are installed at image build time.
+
+Dockerfile path: `api/Dockerfile`.
+
+Run the full stack (API + Mosquitto + TimescaleDB):
+
+```bash
+docker compose up -d --build
+```
+
+View API logs:
+
+```bash
+docker compose logs -f api
+```
 
 ## MQTT Topics
 
@@ -65,7 +83,7 @@ Notes:
 
 ## Database Notes
 
-`timescaledb-init.sql` initializes the main time-series table (`presence_events`) and indexes.
+`db/init/timescaledb-init.sql` initializes the main time-series table (`presence_events`) and indexes.
 
 App-managed tables:
 
