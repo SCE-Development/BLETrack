@@ -1,12 +1,14 @@
 import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
+import Navbar from './Components/Navbar/Navbar';
 import Routing from './Routing';
 
 function App() {
   return (
     <BrowserRouter>
       <div className="min-h-screen bg-base-100 text-base-content">
-        <main className="max-w-7xl mx-auto px-4 py-6">
+        <Navbar />
+        <main className="max-w-7xl mx-auto px-6 py-8">
           <Routing />
         </main>
       </div>
