@@ -3,11 +3,9 @@ import { NavLink } from 'react-router-dom';
 
 function Navbar() {
   const navItems = [
-    { path: '/', label: 'Dashboard' },
-    { path: '/devices', label: 'Devices' },
-    { path: '/pairing', label: 'Pairing' },
-    { path: '/presence', label: 'Presence' },
-    { path: '/debug', label: 'Debug' },
+    { path: '/', label: 'Dashboard', exact: true },
+    { path: '/devices', label: 'Devices', exact: false },
+    { path: '/pairing', label: 'Pairing', exact: false },
   ];
 
   return (
@@ -30,9 +28,9 @@ function Navbar() {
             <li key={item.path}>
               <NavLink
                 to={item.path}
-                exact={item.path === '/'}
+                exact={item.exact}
                 className="text-gray-300 hover:text-white px-4 py-2 rounded-lg transition-colors"
-                activeClassName="text-blue-400 bg-base-300"
+                activeClassName="!text-blue-400 !bg-base-300"
               >
                 {item.label}
               </NavLink>
