@@ -1,0 +1,14 @@
+services:
+  bletrack-nginx:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: bletrack-nginx
+    restart: always
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+networks:
+  default:
+    external:
+      name: sce

@@ -18,8 +18,33 @@ services:
     ports:
       - "5055:5055"
     depends_on:
-      - mosquitto
-      - timescaledb
+      mosquitto:
+        condition: service_started
+      timescaledb:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:5055/health')\""]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - ble_net
+
+  tunnel:
+    build:
+      context: ./tunnel
+      dockerfile: Dockerfile
+    container_name: bletrack-tunnel
+    restart: always
+    environment:
+      CORE_V4_IP: ${CORE_V4_IP}
+    volumes:
+      - ~/.ssh/id_rsa:/app/ssh/id_rsa:ro
+      - ~/.ssh/known_hosts:/app/ssh/known_hosts:ro
+    depends_on:
+      api:
+        condition: service_healthy
     networks:
       - ble_net
 
@@ -50,6 +75,12 @@ services:
     volumes:
       - timescaledb_data:/var/lib/postgresql/data
       - ./db/init/timescaledb-init.sql:/docker-entrypoint-initdb.d/001-timescaledb-init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-bletrack} -d ${POSTGRES_DB:-bletrack}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     networks:
       - ble_net
 
