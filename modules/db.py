@@ -2,19 +2,13 @@ import os
 from contextlib import contextmanager
 from typing import Any, Dict, Iterator, List, Optional
 
-from dotenv import load_dotenv
 from psycopg import Connection, connect
 from psycopg.rows import dict_row
 from psycopg.types.json import Jsonb
 
 
-load_dotenv()
 
-
-DATABASE_URL = os.getenv(
-    "DATABASE_URL",
-    "postgresql://bletrack:bletrack_dev_password@localhost:5433/bletrack",
-)
+DATABASE_URL = os.getenv("DATABASE_URL")
 
 
 @contextmanager

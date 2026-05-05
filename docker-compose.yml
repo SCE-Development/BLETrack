@@ -8,14 +8,14 @@ services:
     working_dir: /app
     env_file:
       - .env
+    environment:
+      - PYTHONPATH=/app
     volumes:
       - ~/.ssh/id_ed25519-tunnel.pub:/app/ssh_key.pub
       - ~/.ssh/id_ed25519-tunnel:/app/ssh_key
       - ~/.ssh/known_hosts:/app/known_hosts
-      - ./config:/app/config
       - ./api:/app/api
       - ./modules:/app/modules
-      - ./.env:/app/.env # mount the env variables
     ports:
       - "5055:5055"
     depends_on:
@@ -51,6 +51,8 @@ services:
     restart: always
     ports:
       - "5433:5432"
+    env_file:
+      - .env
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-bletrack}
       POSTGRES_USER: ${POSTGRES_USER:-bletrack}
