@@ -3,7 +3,6 @@ import subprocess
 import os
 app = FastAPI()
 
-
 @app.get("/")
 async def execute_curl():
     """
@@ -23,6 +22,13 @@ async def execute_curl():
             "status": "success",
             "output": result.stdout.strip()
         }
+    
+    except subprocess.CalledProcessError as e:
+        # Handles errors if the curl command itself fails (e.g., bad URL, connection refused)
+        raise HTTPException(
+            status_code=500, 
+            detail={"error": "Curl command failed", "stderr": e.stderr.strip()}
+        )
     except Exception as e:
         # Handles any other unexpected Python errors
         raise HTTPException(
