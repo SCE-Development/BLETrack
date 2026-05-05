@@ -7,8 +7,9 @@ WORKDIR /app
 
 # for reading configs + curls to the esp32
 RUN apt-get update && apt-get install -y \
-    jq \    
-    curl \
+    jq \                                                                                           
+    curl \      
+    openssh-client \
     && rm -rf /var/lib/apt/lists/*
 
 
@@ -17,8 +18,6 @@ RUN pip install --no-cache-dir -r /app/api/requirements.txt
 
 COPY . /app
 
-RUN chmod +x /app/api/tun.sh
-
 EXPOSE 5055
 
-ENTRYPOINT ["/app/api/tun.sh"]
+ENTRYPOINT ["sh", "/app/api/tun.sh"]
