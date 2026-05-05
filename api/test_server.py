@@ -12,7 +12,7 @@ async def execute_curl():
     try:
         # Run the curl command
         result = subprocess.run(
-            ["curl", "-X", "GET", f"{os.getenv("ESP_IP")}/json/devices/"],
+            ["curl", "-X", "GET", f"{os.getenv('ESP_IP')}/json/devices/"],
             capture_output=True,  # Captures stdout and stderr
             text=True,            # Returns strings instead of bytes
             check=True            # Raises CalledProcessError if the exit code is non-zero
