@@ -19,4 +19,4 @@ COPY . /app
 
 EXPOSE 5055
 
-ENTRYPOINT ["./tun.sh"]
+ENTRYPOINT ["./app/api/tun.sh"]
