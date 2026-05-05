@@ -23,7 +23,7 @@ open_ssh_tunnel () {
 chmod 600 ${SSH_KEY}
 
 # setup the esp_ip in the env
-export ESP_IP=$(cat /app/config/config.json |  jq -r ".ESP_IP")
+export ESP_IP=$(cat /app/config/config.json |  jq -r "ESP_IP")
 
 open_ssh_tunnel
 exec uvicorn api.test_server:app --host 0.0.0.0 --port 5055
