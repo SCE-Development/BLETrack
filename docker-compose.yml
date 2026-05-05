@@ -8,48 +8,29 @@ services:
     working_dir: /app
     env_file:
       - .env
-    environment:
-      MQTT_BROKER: mosquitto
-      MQTT_PORT: 1883
-      DATABASE_URL: postgresql://${POSTGRES_USER:-bletrack}:${POSTGRES_PASSWORD:-bletrack_dev_password}@timescaledb:5432/${POSTGRES_DB:-bletrack}
     volumes:
       - ~/.ssh/id_ed25519-tunnel.pub:/app/ssh_key.pub
       - ~/.ssh/id_ed25519-tunnel:/app/ssh_key
       - ~/.ssh/known_hosts:/app/known_hosts
       - ./config:/app/config
       - ./api:/app/api
+      - ./modules:/app/modules
+      - ./.env:/app/.env # mount the env variables
     ports:
       - "5055:5055"
-    # depends_on:
-    #   mosquitto:
-    #     condition: service_started
-    #   timescaledb:
-    #     condition: service_healthy
-    # healthcheck:
-    #   test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:5055/health')\""]
-    #   interval: 15s
-    #   timeout: 5s
-    #   retries: 5
-    #   start_period: 30s
+    depends_on:
+      mosquitto:
+        condition: service_started
+      timescaledb:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:5055/health')\""]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     networks:
       - ble_net
-
-  # tunnel:
-  #   build:
-  #     context: ./tunnel
-  #     dockerfile: Dockerfile
-  #   container_name: bletrack-tunnel
-  #   restart: always
-  #   environment:
-  #     CORE_V4_IP: ${CORE_V4_IP}
-  #   volumes:
-  #   tty: true
-  #   depends_on:
-  #     api:
-  #       condition: service_healthy
-  #   networks:
-  #     - ble_net
-
   mosquitto:
     image: eclipse-mosquitto:latest
     container_name: mosquitto
