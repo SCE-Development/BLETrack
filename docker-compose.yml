@@ -13,11 +13,11 @@ services:
       MQTT_PORT: 1883
       DATABASE_URL: postgresql://${POSTGRES_USER:-bletrack}:${POSTGRES_PASSWORD:-bletrack_dev_password}@timescaledb:5432/${POSTGRES_DB:-bletrack}
     volumes:
-      - ./:/app
       - ~/.ssh/id_ed25519-tunnel.pub:/app/ssh_key.pub
       - ~/.ssh/id_ed25519-tunnel:/app/ssh_key
       - ~/.ssh/known_hosts:/app/known_hosts
       - ./config:/app/config
+      - ./:/app
     ports:
       - "5055:5055"
     # depends_on:
