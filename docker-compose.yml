@@ -6,7 +6,6 @@ services:
     container_name: bletrack-api
     restart: always
     working_dir: /app
-    command: uvicorn api.server:app --host 0.0.0.0 --port 5055
     env_file:
       - .env
     environment:
@@ -15,38 +14,41 @@ services:
       DATABASE_URL: postgresql://${POSTGRES_USER:-bletrack}:${POSTGRES_PASSWORD:-bletrack_dev_password}@timescaledb:5432/${POSTGRES_DB:-bletrack}
     volumes:
       - ./:/app
+      - ~/.ssh/id_ed25519-tunnel.pub:/app/ssh_key.pub
+      - ~/.ssh/id_ed25519-tunnel:/app/ssh_key
+      - ~/.ssh/known_hosts:/app/known_hosts
+      - ./config:/app/config
     ports:
       - "5055:5055"
-    depends_on:
-      mosquitto:
-        condition: service_started
-      timescaledb:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:5055/health')\""]
-      interval: 15s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
+    # depends_on:
+    #   mosquitto:
+    #     condition: service_started
+    #   timescaledb:
+    #     condition: service_healthy
+    # healthcheck:
+    #   test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:5055/health')\""]
+    #   interval: 15s
+    #   timeout: 5s
+    #   retries: 5
+    #   start_period: 30s
     networks:
       - ble_net
 
-  tunnel:
-    build:
-      context: ./tunnel
-      dockerfile: Dockerfile
-    container_name: bletrack-tunnel
-    restart: always
-    environment:
-      CORE_V4_IP: ${CORE_V4_IP}
-    volumes:
-      - ~/.ssh/id_rsa:/app/ssh/id_rsa:ro
-      - ~/.ssh/known_hosts:/app/ssh/known_hosts:ro
-    depends_on:
-      api:
-        condition: service_healthy
-    networks:
-      - ble_net
+  # tunnel:
+  #   build:
+  #     context: ./tunnel
+  #     dockerfile: Dockerfile
+  #   container_name: bletrack-tunnel
+  #   restart: always
+  #   environment:
+  #     CORE_V4_IP: ${CORE_V4_IP}
+  #   volumes:
+  #   tty: true
+  #   depends_on:
+  #     api:
+  #       condition: service_healthy
+  #   networks:
+  #     - ble_net
 
   mosquitto:
     image: eclipse-mosquitto:latest

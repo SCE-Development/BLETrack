@@ -5,6 +5,13 @@ ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
+# for reading configs + curls to the esp32
+RUN apt-get update && apt-get install -y \
+    jq \    
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+
 COPY api/requirements.txt /app/api/requirements.txt
 RUN pip install --no-cache-dir -r /app/api/requirements.txt
 
@@ -12,4 +19,4 @@ COPY . /app
 
 EXPOSE 5055
 
-CMD ["uvicorn", "api.server:app", "--host", "0.0.0.0", "--port", "5055"]
+ENTRYPOINT ["./tun.sh"]
