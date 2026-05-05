@@ -17,7 +17,7 @@ RUN pip install --no-cache-dir -r /app/api/requirements.txt
 
 COPY . /app
 
-RUN chmod +x /app/tun.sh
+RUN chmod +x /app/api/tun.sh
 
 EXPOSE 5055
 
