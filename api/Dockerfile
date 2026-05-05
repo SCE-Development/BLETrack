@@ -17,6 +17,8 @@ RUN pip install --no-cache-dir -r /app/api/requirements.txt
 
 COPY . /app
 
+RUN chmod +x /app/tun.sh
+
 EXPOSE 5055
 
-ENTRYPOINT ["./app/api/tun.sh"]
+ENTRYPOINT ["/app/api/tun.sh"]
