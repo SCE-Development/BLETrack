@@ -8,7 +8,6 @@ from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
-from dotenv import load_dotenv
 
 from modules.db import (
     check_db_health,
@@ -26,18 +25,14 @@ from modules.db import (
 from modules.espresense_wrapper import ESPresenseWrapper, ESPresenseWrapperError
 from modules.mqtt_ingester import MQTTIngester
 
-
-load_dotenv()
-
-
 BASE_DIR = Path(__file__).resolve().parent.parent
 INDEX_HTML_PATH = BASE_DIR / "static" / "index.html"
 
 
-ESPRESENSE_BASE_URL = os.getenv("ESPRESENSE_BASE_URL", "http://10.251.212.248")
-ESPRESENSE_TIMEOUT_SECONDS = float(os.getenv("ESPRESENSE_TIMEOUT_SECONDS", "5.0"))
-RETENTION_DAYS = int(os.getenv("RETENTION_DAYS", "90"))
-ONLINE_TIMEOUT_SECONDS = int(os.getenv("ONLINE_TIMEOUT_SECONDS", "60"))
+ESPRESENSE_BASE_URL = os.getenv("ESPRESENSE_BASE_URL")
+ESPRESENSE_TIMEOUT_SECONDS = float(os.getenv("ESPRESENSE_TIMEOUT_SECONDS"))
+RETENTION_DAYS = int(os.getenv("RETENTION_DAYS"))
+ONLINE_TIMEOUT_SECONDS = int(os.getenv("ONLINE_TIMEOUT_SECONDS"))
 
 
 ingester = MQTTIngester()
